@@ -1,0 +1,9 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:grok="http://namespaces.zope.org/grok">
+
+  <include package="megrok.z3cform" />
+  <include package="dolmen.content" />
+  <grok:grok package="." />
+
+</configure>
