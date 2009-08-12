@@ -37,7 +37,8 @@ class Add(megrok.z3cform.PageAddForm):
     @CachedProperty
     def fields(self):
         ifaces = self.factory.getSchema()
-        fields = megrok.z3cform.field.Fields(*ifaces)
+        fields = megrok.z3cform.field.Fields(*ifaces).omit('__parent__')
+        
         modifier = queryClassMultiAdapter(
             (self.factory.factory, self, self.request),
             self.context,
