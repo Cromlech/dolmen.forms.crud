@@ -35,7 +35,7 @@ def suiteFromPackage(name):
 
 def test_suite():
     suite = unittest.TestSuite()
-    for name in ['adder', 'forms', 'events']:
+    for name in ['adder']:
         suite.addTest(suiteFromPackage(name))
     readme = functional.FunctionalDocFileSuite('../README.txt')
     readme.layer = FunctionalLayer

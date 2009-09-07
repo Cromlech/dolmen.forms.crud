@@ -70,18 +70,6 @@ Perfect. Our adding view is ready to be used. Before testing the add form itself
   True
 
 The adding view works as intended. The real interest in using such an abstraction is to be able to easily switch adding behaviors just by registering a new component.
-
-To finish this first steps into the `dolmen.forms.crud` librabry, we need to verify that everything is OK while accessing the factory through a browser :
-
-  >>> from zope.testbrowser.testing import Browser
-  >>> browser = Browser()
-  >>> browser.addHeader('Authorization', 'Basic mgr:mgrpw')
-  >>> browser.handleErrors = False
-
-  >>> browser.open('http://localhost/sietch/++add++fremen')
-  >>> browser.contents
-  
-
 """
 
 import zope.schema
