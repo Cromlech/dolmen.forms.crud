@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.0'
+version = '0.2'
 
 setup(name='dolmen.forms.crud',
       version=version,
@@ -24,7 +24,19 @@ setup(name='dolmen.forms.crud',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          # -*- Extra requirements: -*-
+          'grokcore.security',
+          'grokcore.component',
+          'dolmen.content',
+          'megrok.z3cform',
+          'zope.event',
+          'zope.schema',
+          'zope.location',
+          'zope.security',
+          'zope.component',
+          'zope.interface',
+          'zope.configuration',
+          'zope.lifecycleevent',
+          'zope.cachedescriptors',
       ],
       entry_points="""
       # -*- Entry points: -*-

@@ -16,7 +16,7 @@ from zope.security.management import checkPermission
 from zope.cachedescriptors.property import CachedProperty
 from zope.component import queryMultiAdapter, getUtility
 
-_ = MessageFactory("dolmen")
+_ = MessageFactory("dolmen.forms")
 
 
 class Add(megrok.z3cform.PageAddForm):

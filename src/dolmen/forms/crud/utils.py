@@ -6,6 +6,10 @@ from zope.component import queryMultiAdapter, getGlobalSiteManager
 
 
 def queryClassMultiAdapter(adapts, ob, interface, name=u''):
+    """This function searches the component registry for any adapter
+    registered for an instance of the given class. It lookups and returns
+    it correctly factored.
+    """
     sm = getGlobalSiteManager()
     klass = adapts[0]
     required = implementedBy(klass)

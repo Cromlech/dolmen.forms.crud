@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import grokcore.view.interfaces as view
-import grokcore.formlib.interfaces as form
 from zope.schema import Object
 from zope.schema.interfaces import IField
-from zope.configuration.fields import GlobalObject
 from zope.interface import Interface, Attribute
 from zope.location.interfaces import ILocation
-
+from zope.configuration.fields import GlobalObject
 
 
 class IAdding(ILocation):
