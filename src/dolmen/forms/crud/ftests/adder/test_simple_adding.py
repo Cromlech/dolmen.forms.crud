@@ -30,8 +30,15 @@ Let's have a quick overview:
 
   >>> from zope.component import getMultiAdapter
   >>> from zope.publisher.browser import TestRequest
+  >>> from z3c.form.interfaces import IFormLayer
 
-  >>> request = TestRequest()
+  >>> from zope.publisher.interfaces import browser
+  >>> class BaseFormSkin(IFormLayer, browser.IDefaultBrowserLayer):
+  ...     '''A skin layer for forms.
+  ...     '''
+
+  >>> request = TestRequest(skin=BaseFormSkin)
+
   >>> addingview = getMultiAdapter((sietch, request), name='add')
   >>> addingview
   <dolmen.forms.crud.addview.Adder object at ...>
@@ -59,19 +66,20 @@ AddForm:
   >>> testing.grok_component('addform', AddForm)
   True
 
-  >>> addingview.traverse('fremen', [])
+  >>> form = addingview.traverse('fremen', [])
+  >>> form
   <dolmen.forms.crud.ftests.adder.test_simple_adding.AddForm object at ...>
 
-
 Here we go. Our AddForm is returned as we traverse toward the factory 'fremen'.
-Let's have a look at the adding view property :
+Let's have a look at the adding view property and methods :
 
   >>> addingview.content_name
   'fremen'
-
+  >>> addingview.nextURL()
+  'http://127.0.0.1/sietch'
 
 Perfect. Our adding view is ready to be used. Before testing the AddForm
-itself, let's have a try at the 'add' method :
+itself, let's have a try at the `add` method :
 
   >>> naib = Fremen()
   >>> added_item = addingview.add(naib)
@@ -82,6 +90,36 @@ itself, let's have a try at the 'add' method :
   >>> added_item.__parent__ is sietch
   True
 
+
+The `add` method checks if the constraints are respected. If the container has
+a defined restriction (using zope.app.container.constraints), we get an error
+if the contract is violated.
+
+  >>> rabban = Harkonnen()
+  >>> addingview.add(rabban)
+  Traceback (most recent call last):
+  ...
+  InvalidItemType: (<...Sietch object at ...>, <...Harkonnen object at ...>, (<InterfaceClass dolmen.forms.crud.ftests.adder.test_simple_adding.IDesertWarrior>,))
+
+
+The `add` method of the adding view can be called from the AddForm, to delegate
+the adding operation. The generic adding view already handles the common
+operations such as naming and persistence. Still, our AddForm is responsible
+of the factoring of the item. Let's test very quickly the important attributes
+and methods :
+
+  >>> form.update()
+  >>> form.updateForm()
+  >>> form.fields
+  <z3c.form.field.Fields object at ...>
+  >>> factored_item = form.create({'title': u'Shani', 'water': 5})
+  >>> factored_item
+  <dolmen.forms.crud.ftests.adder.test_simple_adding.Fremen object at ...>
+  >>> factored_item.title
+  u'Shani'
+  >>> factored_item.water
+  5
+
 The adding view works as intended. The real interest in using such an
 abstraction is to be able to easily switch adding behaviors just by
 registering a new component.
@@ -89,6 +127,7 @@ registering a new component.
 
 import zope.schema
 import dolmen.content as dolmen
+from zope.app.container.constraints import contains
 
 
 class IDesertWarrior(dolmen.IBaseContent):
@@ -101,10 +140,17 @@ class IDesertWarrior(dolmen.IBaseContent):
         )
 
 
+class IDesertCave(dolmen.IBaseContent):
+    """Defines a cave carved in the mountains by the Coriolis storms.
+    """
+    contains(IDesertWarrior)
+
+
 class Sietch(dolmen.Container):
     """A grotto located on Arrakis.
     """
     dolmen.name('sietch')
+    dolmen.schema(IDesertCave)
     dolmen.nofactory()
     
 
@@ -121,3 +167,10 @@ class Fremen(dolmen.Content):
     dolmen.name(u'Fremen Warrior')
     dolmen.schema(IDesertWarrior)
     dolmen.factory(TrainingCamp)
+
+
+class Harkonnen(dolmen.Content):
+    """A native of Giedi Prime.
+    """
+    dolmen.name('Harkonnen')
+    dolmen.nofactory()
