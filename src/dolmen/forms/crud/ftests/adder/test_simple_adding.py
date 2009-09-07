@@ -2,9 +2,16 @@
 Adding view
 ===========
 
-`dolmen.forms.crud` provides an abstraction for the 'adding' action. It allows pluggability at the container level and does handle the naming/persistence duet. More explicitly, it's a named adapter that will query the AddForm, call the object checking methods, choose a name using a INameChooser and finally, if everything went smoothly, set it on the context.
+`dolmen.forms.crud` provides an abstraction for the 'adding' action.
+It allows pluggability at the container level and does handle the
+naming/persistence duet. More explicitly, it's a named adapter that will
+query the AddForm, call the object checking methods, choose a name using
+a INameChooser and finally, if everything went smoothly, set it on the context.
 
-A base AddView is registered out-of-the-box as a named traversable adapter called 'add'. It uses the following pattern: ++add++factory_name. `factory_name` must be the name of a `dolmen.content.IFactory` component.
+A base AddView is registered out-of-the-box as a named traversable adapter
+called 'add'. It uses the following pattern: ++add++factory_name.
+`factory_name` must be the name of a `dolmen.content.IFactory` component.
+
 
 Let's first create a container in which we'll test the adding view :
 
@@ -16,6 +23,7 @@ Let's first create a container in which we'll test the adding view :
   >>> from zope.app.testing.functional import getRootFolder
   >>> root = getRootFolder()
   >>> root['sietch'] = sietch
+
 
 The container created, the adding view should be available and operational.
 Let's have a quick overview:
@@ -29,7 +37,9 @@ Let's have a quick overview:
   <dolmen.forms.crud.addview.Adder object at ...>
 
 
-The adding view is available for our item. Though, if we try to access our current factory, a NotFound error will be raised : we have no add form registered.
+The adding view is available for our item. Though, if we try to access our
+current factory, a NotFound error will be raised : we have no add form
+registered.
 
   >>> addingview.traverse('fremen', [])
   Traceback (most recent call last):
@@ -37,7 +47,8 @@ The adding view is available for our item. Though, if we try to access our curre
   NotFound: Object: <dolmen.forms.crud.ftests...>, name: 'fremen'
 
 
-Let's try to check, now, if we create and register a very basic generic crud Add Form:
+Let's try to check, now, if we create and register a very basic generic crud
+AddForm:
 
   >>> import dolmen.forms.crud as crud
   >>> class AddForm(crud.Add):
@@ -58,7 +69,9 @@ Let's have a look at the adding view property :
   >>> addingview.content_name
   'fremen'
 
-Perfect. Our adding view is ready to be used. Before testing the add form itself, let's have a try at the 'add' method :
+
+Perfect. Our adding view is ready to be used. Before testing the AddForm
+itself, let's have a try at the 'add' method :
 
   >>> naib = Fremen()
   >>> added_item = addingview.add(naib)
@@ -69,7 +82,9 @@ Perfect. Our adding view is ready to be used. Before testing the add form itself
   >>> added_item.__parent__ is sietch
   True
 
-The adding view works as intended. The real interest in using such an abstraction is to be able to easily switch adding behaviors just by registering a new component.
+The adding view works as intended. The real interest in using such an
+abstraction is to be able to easily switch adding behaviors just by
+registering a new component.
 """
 
 import zope.schema
