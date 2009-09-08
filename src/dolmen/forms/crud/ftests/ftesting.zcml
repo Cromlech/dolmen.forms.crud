@@ -36,6 +36,10 @@
   <securityPolicy
       component="zope.securitypolicy.zopepolicy.ZopeSecurityPolicy" />
 
+  <class class="zope.publisher.http.HTTPRequest">
+    <implements interface="z3c.form.interfaces.IFormLayer" />
+  </class>
+
   <unauthenticatedPrincipal
       id="zope.anybody"
       title="Unauthenticated User"

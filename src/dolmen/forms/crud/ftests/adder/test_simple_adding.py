@@ -30,14 +30,8 @@ Let's have a quick overview:
 
   >>> from zope.component import getMultiAdapter
   >>> from zope.publisher.browser import TestRequest
-  >>> from z3c.form.interfaces import IFormLayer
-
-  >>> from zope.publisher.interfaces import browser
-  >>> class BaseFormSkin(IFormLayer, browser.IDefaultBrowserLayer):
-  ...     '''A skin layer for forms.
-  ...     '''
-
-  >>> request = TestRequest(skin=BaseFormSkin)
+ 
+  >>> request = TestRequest()
 
   >>> addingview = getMultiAdapter((sietch, request), name='add')
   >>> addingview
