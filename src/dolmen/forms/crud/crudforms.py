@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import megrok.z3cform
 import grokcore.component as grok
+import megrok.z3cform.base as form
 from grokcore.security import require
 
 import dolmen.content as content
@@ -9,17 +9,17 @@ from dolmen.forms.crud import interfaces as crud
 from dolmen.forms.crud.utils import queryClassMultiAdapter
 
 from zope.event import notify
-from zope.lifecycleevent import Attributes, ObjectCreatedEvent
 from zope.i18nmessageid import MessageFactory
 from zope.security.interfaces import Unauthorized
 from zope.security.management import checkPermission
-from zope.cachedescriptors.property import CachedProperty
 from zope.component import queryMultiAdapter, getUtility
+from zope.cachedescriptors.property import CachedProperty
+from zope.lifecycleevent import Attributes, ObjectCreatedEvent
 
 _ = MessageFactory("dolmen.forms")
 
 
-class Add(megrok.z3cform.PageAddForm):
+class Add(form.PageAddForm):
     """The add form itself is not protected. The security is checked on
     'update'. It checks if the 'require' directive of the factored item
     is respected on the context.
@@ -37,7 +37,7 @@ class Add(megrok.z3cform.PageAddForm):
     @CachedProperty
     def fields(self):
         ifaces = self.factory.getSchema()
-        fields = megrok.z3cform.field.Fields(*ifaces).omit('__parent__')
+        fields = form.field.Fields(*ifaces).omit('__parent__')
         
         modifier = queryClassMultiAdapter(
             (self.factory.factory, self, self.request),
@@ -58,7 +58,7 @@ class Add(megrok.z3cform.PageAddForm):
     def create(self, data):
         obj = self.factory()
         notify(ObjectCreatedEvent(obj))
-        megrok.z3cform.apply_data_event(self, obj, data)
+        form.apply_data_event(self, obj, data)
         return obj
 
     def update(self):
@@ -71,9 +71,9 @@ class Add(megrok.z3cform.PageAddForm):
             raise Unauthorized(u"You don't have the permission to add %r" %
                                content)
         
-        megrok.z3cform.PageAddForm.update(self)
+        form.PageAddForm.update(self)
 
-    @megrok.z3cform.button.buttonAndHandler(_('Save'), name='save')
+    @form.button.buttonAndHandler(_('Save'), name='save')
     def handleSave(self, action):
         data, errors = self.extractData()
         if errors:
@@ -84,10 +84,10 @@ class Add(megrok.z3cform.PageAddForm):
             self.redirect(self.url(obj))
 
 
-class Edit(megrok.z3cform.PageEditForm):
+class Edit(form.PageEditForm):
     grok.baseclass()
     grok.context(content.IBaseContent)
-    megrok.z3cform.extends(megrok.z3cform.PageEditForm)
+    form.extends(form.PageEditForm)
     
     form_name = _(u"Edit")
 
@@ -98,7 +98,7 @@ class Edit(megrok.z3cform.PageEditForm):
     @CachedProperty
     def fields(self):
         iface = content.schema.bind().get(self.context)
-        fields = megrok.z3cform.field.Fields(*iface).omit('__parent__')
+        fields = form.field.Fields(*iface).omit('__parent__')
         modifier = queryMultiAdapter(
             (self.context, self, self.request),
             crud.IFieldsCustomization
@@ -110,13 +110,13 @@ class Edit(megrok.z3cform.PageEditForm):
     def nextURL(self):
         return self.redirect(self.url(self.context))
 
-    @megrok.z3cform.button.buttonAndHandler(_('Apply'), name='apply')
+    @form.button.buttonAndHandler(_('Apply'), name='apply')
     def handleApply(self, action):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
             return
-        changes = megrok.z3cform.apply_data_event(self, self.context, data)
+        changes = form.apply_data_event(self, self.context, data)
         if changes:
             self.flash(self.successMessage)
         else:
@@ -124,7 +124,7 @@ class Edit(megrok.z3cform.PageEditForm):
         self.redirect(self.url(self.context))
 
 
-class Display(megrok.z3cform.PageDisplayForm):
+class Display(form.PageDisplayForm):
     grok.baseclass()
     grok.context(content.IBaseContent)
 
@@ -137,7 +137,7 @@ class Display(megrok.z3cform.PageDisplayForm):
     @CachedProperty
     def fields(self):
         iface = content.schema.bind().get(self.context)
-        fields = megrok.z3cform.field.Fields(*iface).omit('__parent__')
+        fields = form.field.Fields(*iface).omit('__parent__')
         modifier = queryMultiAdapter(
             (self.context, self, self.request),
             crud.IFieldsCustomization

@@ -18,4 +18,6 @@ src/dolmen/forms/crud/events.py
 src/dolmen/forms/crud/interfaces.py
 src/dolmen/forms/crud/utils.py
 src/dolmen/forms/crud/ftests/__init__.py
-src/dolmen/forms/crud/ftests/test_functional.py
+src/dolmen/forms/crud/ftests/test_all.py
+src/dolmen/forms/crud/ftests/adder/__init__.py
+src/dolmen/forms/crud/ftests/adder/test_simple_adding.py
