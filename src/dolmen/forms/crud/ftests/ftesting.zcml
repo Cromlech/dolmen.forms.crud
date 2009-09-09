@@ -10,10 +10,8 @@
   <include package="zope.app.publication" file="meta.zcml" />
 
   <!-- Dependencies meta files -->
-  <include package="grokcore.component" file="meta.zcml"/>
-  <include package="grokcore.view" file="meta-minimal.zcml" />
-  <include package="megrok.z3cform" file="meta.zcml"/>
   <include package="dolmen.content" file="meta.zcml" />
+  <include package="megrok.z3cform.base" file="meta.zcml"/>
 
   <!-- Packages with needed components -->
   <include package="zope.publisher" />

@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import grokcore.component as grok
-import megrok.z3cform.base as form
-from grokcore.security import require
+import grokcore.security as grok
 
 import dolmen.content as content
+import dolmen.forms.base as form
 from dolmen.forms.crud import interfaces as crud
 from dolmen.forms.crud.utils import queryClassMultiAdapter
 
@@ -16,7 +15,7 @@ from zope.component import queryMultiAdapter, getUtility
 from zope.cachedescriptors.property import CachedProperty
 from zope.lifecycleevent import Attributes, ObjectCreatedEvent
 
-_ = MessageFactory("dolmen.forms")
+_ = MessageFactory("dolmen")
 
 
 class Add(form.PageAddForm):
@@ -37,7 +36,7 @@ class Add(form.PageAddForm):
     @CachedProperty
     def fields(self):
         ifaces = self.factory.getSchema()
-        fields = form.field.Fields(*ifaces).omit('__parent__')
+        fields = form.Fields(*ifaces).omit('__parent__')
         
         modifier = queryClassMultiAdapter(
             (self.factory.factory, self, self.request),
@@ -50,7 +49,7 @@ class Add(form.PageAddForm):
         return fields
 
     def nextURL(self):
-        return self.url(self.context.nextURL())
+        return self.context.nextURL()
 
     def add(self, object):
         return self.context.add(object)
@@ -64,7 +63,7 @@ class Add(form.PageAddForm):
     def update(self):
         content_name = self.context.content_name
         self.factory = getUtility(content.IFactory, name=content_name)
-        permission = require.bind().get(self.factory.factory)
+        permission = grok.require.bind().get(self.factory.factory)
 
         # Check explicitly the permission on the context.
         if not checkPermission(permission, self.context):
@@ -98,7 +97,7 @@ class Edit(form.PageEditForm):
     @CachedProperty
     def fields(self):
         iface = content.schema.bind().get(self.context)
-        fields = form.field.Fields(*iface).omit('__parent__')
+        fields = form.Fields(*iface).omit('__parent__')
         modifier = queryMultiAdapter(
             (self.context, self, self.request),
             crud.IFieldsCustomization
@@ -137,7 +136,7 @@ class Display(form.PageDisplayForm):
     @CachedProperty
     def fields(self):
         iface = content.schema.bind().get(self.context)
-        fields = form.field.Fields(*iface).omit('__parent__')
+        fields = form.Fields(*iface).omit('__parent__')
         modifier = queryMultiAdapter(
             (self.context, self, self.request),
             crud.IFieldsCustomization

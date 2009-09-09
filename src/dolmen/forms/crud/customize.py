@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import grokcore.component as grok
-from dolmen.forms.crud import IForm, IFieldsCustomization
 from zope.interface import Interface
+from dolmen.forms.crud import IForm, IFieldsCustomization
 
 
 class FieldsCustomizer(grok.MultiAdapter):
