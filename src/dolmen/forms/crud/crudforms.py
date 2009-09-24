@@ -6,6 +6,7 @@ import dolmen.content as content
 import dolmen.forms.base as form
 from dolmen.forms.crud import interfaces as crud
 from dolmen.forms.crud.utils import queryClassMultiAdapter
+from z3c.form.interfaces import IForm, IAddForm, IEditForm, IDisplayForm
 
 from zope.event import notify
 from zope.i18nmessageid import MessageFactory

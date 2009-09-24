@@ -16,6 +16,7 @@ src/dolmen/forms/crud/crudforms.py
 src/dolmen/forms/crud/customize.py
 src/dolmen/forms/crud/events.py
 src/dolmen/forms/crud/interfaces.py
+src/dolmen/forms/crud/render.py
 src/dolmen/forms/crud/utils.py
 src/dolmen/forms/crud/ftests/__init__.py
 src/dolmen/forms/crud/ftests/test_all.py

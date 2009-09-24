@@ -2,7 +2,8 @@
 
 import grokcore.component as grok
 from zope.interface import Interface
-from dolmen.forms.crud import IForm, IFieldsCustomization
+from dolmen.forms.base import IForm
+from dolmen.forms.crud import IFieldsCustomization
 
 
 class FieldsCustomizer(grok.MultiAdapter):

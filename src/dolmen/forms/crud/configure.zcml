@@ -4,6 +4,7 @@
 
   <include package="megrok.z3cform.base" />
   <include package="megrok.z3cform.base" file="meta.zcml" />
+  <include package="megrok.pagetemplate" file="meta.zcml" />
   <include package="dolmen.content" />
   <grok:grok package="." />
 

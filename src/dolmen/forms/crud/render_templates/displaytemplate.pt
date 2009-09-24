@@ -1,0 +1,20 @@
+<div class="defaultview">
+  <h1 tal:condition="view/label" tal:content="view/label" />
+ 
+  <tal:block tal:repeat="widget view/widgets/values">
+    <div class="field"
+	 tal:define="widget_odd repeat/widget/odd;
+		     description  widget/field/description;
+		     error widget/error;
+		     idx repeat/widget/index"
+	 tal:attributes="class python:'widget' + str(idx)
+			 + (error and ' field-error' or '')">
+      <label tal:condition="widget/label"
+	     tal:attributes="for widget/id">
+	<span i18n:translate=""
+	      tal:content="widget/label">label</span>
+      </label>
+      <div class="widget" tal:content="structure widget/render" />
+    </div>
+  </tal:block>
+</div>
