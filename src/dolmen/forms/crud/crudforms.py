@@ -58,7 +58,7 @@ class Add(form.PageAddForm):
     def create(self, data):
         obj = self.factory()
         notify(ObjectCreatedEvent(obj))
-        form.apply_data_event(self, obj, data)
+        form.apply_data_event(self.fields, obj, data)
         return obj
 
     def update(self):
@@ -116,7 +116,7 @@ class Edit(form.PageEditForm):
         if errors:
             self.status = self.formErrorsMessage
             return
-        changes = form.apply_data_event(self, self.context, data)
+        changes = form.apply_data_event(self.fields, self.context, data)
         if changes:
             self.flash(self.successMessage)
         else:
