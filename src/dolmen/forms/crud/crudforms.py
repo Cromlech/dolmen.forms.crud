@@ -93,7 +93,8 @@ class Edit(form.PageEditForm):
 
     @property
     def label(self):
-        return _(u"edit_action", mapping={"name": self.context.title})
+        return _(u"edit_action", default=u"Edit: $name",
+                 mapping={"name": self.context.title})
 
     @CachedProperty
     def fields(self):
@@ -137,7 +138,7 @@ class Display(form.PageDisplayForm):
     @CachedProperty
     def fields(self):
         iface = content.schema.bind().get(self.context)
-        fields = form.Fields(*iface).omit('__parent__')
+        fields = form.Fields(*iface).omit('__parent__', 'title')
         modifier = queryMultiAdapter(
             (self.context, self, self.request),
             crud.IFieldsCustomization

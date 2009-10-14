@@ -10,6 +10,7 @@
 	<span i18n:translate=""
 	      tal:content="widget/label">label</span>
       </label>
+      <p class="discreet" tal:content="description" />
       <div class="widget" tal:content="structure widget/render" />
     </div>
   </tal:block>
