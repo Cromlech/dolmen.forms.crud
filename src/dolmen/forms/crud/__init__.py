@@ -1,4 +1,4 @@
-from interfaces import *
+from interfaces import IAdding, IFactoryAdding, IFieldsCustomization
 from addview import Adder
-from crudforms import Add, Display, Edit
+from crudforms import Display, Add, Edit
 from customize import FieldsCustomizer

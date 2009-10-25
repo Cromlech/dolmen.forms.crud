@@ -1,43 +1,55 @@
 # -*- coding: utf-8 -*-
 
+import dolmen.content
 import grokcore.component as grok
-from dolmen.content import IFactory
-from dolmen.forms.crud import IAdding
+from dolmen.forms.crud import IFactoryAdding
+
+from zope.schema.fieldproperty import FieldProperty
 from zope.component import queryMultiAdapter, queryUtility
+
 from zope.publisher.interfaces import NotFound
+from zope.publisher.interfaces.http import IHTTPRequest
+
+from zope.security.interfaces import Unauthorized
+from zope.security.management import checkPermission
+
 from zope.traversing.interfaces import ITraversable
 from zope.traversing.browser.absoluteurl import absoluteURL
+
 from zope.app.container.constraints import checkObject
-from zope.publisher.interfaces.http import IHTTPRequest
 from zope.app.container.interfaces import IContainer, INameChooser
 
 
 class Adder(grok.MultiAdapter):
     grok.name('add')
     grok.adapts(IContainer, IHTTPRequest)
-    grok.implements(IAdding)
+    grok.implements(IFactoryAdding)
     grok.provides(ITraversable)
 
+    __name__ = u""
+    factory = FieldProperty(IFactoryAdding['factory'])
+    
     def __init__(self, context, request):
         self.context = context
         self.request = request
         self.__parent__ = context
-        self.__name__ = u""
-        self.content_name = None
-
 
     def traverse(self, name, ignore):
         """See dolmen.content.interfaces.IFactory
         """
-        factory = queryUtility(IFactory, name)
+        factory = queryUtility(dolmen.content.IFactory, name)
         
         if factory is not None:
-            self.content_name = name
-            addform = queryMultiAdapter((self, self.request),
-                                        name=factory.addform)
-            if addform is not None:
-                return addform
-            
+            permission = dolmen.content.require.bind().get(factory.factory)
+            if checkPermission(permission, self.context):
+                self.factory = factory
+                addform = queryMultiAdapter(
+                    (self, self.request), name=factory.addform)
+                if addform is not None:
+                    return addform
+            else:
+                raise Unauthorized("%r requires the %r permission." %
+                                   (factory.factory, permission))
         raise NotFound(self.context, name, self.request)
         
 
@@ -47,7 +59,7 @@ class Adder(grok.MultiAdapter):
         container = self.context
 
         # check precondition
-        checkObject(container, self.content_name, content)
+        checkObject(container, '__temporary__', content)
 
         # choose name in container
         chooser = INameChooser(container)

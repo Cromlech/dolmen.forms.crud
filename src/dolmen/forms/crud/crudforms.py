@@ -6,7 +6,7 @@ import dolmen.content as content
 import dolmen.forms.base as form
 from dolmen.forms.crud import interfaces as crud
 from dolmen.forms.crud.utils import queryClassMultiAdapter
-from z3c.form.interfaces import IForm, IAddForm, IEditForm, IDisplayForm
+from z3c.form.interfaces import IForm, IEditForm, IDisplayForm
 
 from zope.event import notify
 from zope.i18nmessageid import MessageFactory
@@ -26,21 +26,21 @@ class Add(form.PageAddForm):
     """
     grok.baseclass()
     grok.name('dolmen.add')
-    grok.context(crud.IAdding)
+    grok.context(crud.IFactoryAdding)
 
     form_name = _(u"Add")
 
     @property
     def label(self):
-        return self.factory.title
+        return self.context.factory.title
 
     @CachedProperty
     def fields(self):
-        ifaces = self.factory.getSchema()
+        ifaces = self.context.factory.getSchema()
         fields = form.Fields(*ifaces).omit('__parent__')
         
         modifier = queryClassMultiAdapter(
-            (self.factory.factory, self, self.request),
+            (self.context.factory.factory, self, self.request),
             self.context,
             crud.IFieldsCustomization
             )
@@ -56,22 +56,10 @@ class Add(form.PageAddForm):
         return self.context.add(object)
 
     def create(self, data):
-        obj = self.factory()
+        obj = self.context.factory()
         notify(ObjectCreatedEvent(obj))
         form.apply_data_event(self.fields, obj, data)
         return obj
-
-    def update(self):
-        content_name = self.context.content_name
-        self.factory = getUtility(content.IFactory, name=content_name)
-        permission = grok.require.bind().get(self.factory.factory)
-
-        # Check explicitly the permission on the context.
-        if not checkPermission(permission, self.context):
-            raise Unauthorized(u"You don't have the permission to add %r" %
-                               content)
-        
-        form.PageAddForm.update(self)
 
     @form.button.buttonAndHandler(_('Save'), name='save')
     def handleSave(self, action):

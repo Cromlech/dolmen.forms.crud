@@ -1,17 +1,40 @@
+from os.path import join
 from setuptools import setup, find_packages
-import os
 
-version = '0.2'
+name = 'dolmen.forms.crud'
+version = '0.1'
+readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
+history = open(join('docs', 'HISTORY.txt')).read()
 
-setup(name='dolmen.forms.crud',
+install_requires = [
+    'setuptools',
+    'grokcore.security',
+    'grokcore.component',
+    'zope.event',
+    'zope.schema',
+    'zope.location',
+    'zope.security',
+    'zope.component',
+    'zope.interface',
+    'zope.configuration',
+    'zope.lifecycleevent',
+    'zope.cachedescriptors',
+    'dolmen.field>=0.3',
+    'dolmen.content>=0.2.2',
+    'dolmen.forms.base>=0.1',
+    'megrok.z3cform.base >= 0.1',
+    ]
+
+tests_require = install_requires + [
+    'zope.testing',
+    'zope.app.testing',
+    'zope.app.zcmlfiles',
+    ]
+
+setup(name=name,
       version=version,
       description="",
-      long_description=open("README.txt").read() + "\n" +
-                       open(os.path.join("docs", "HISTORY.txt")).read(),
-      classifiers=[
-        "Programming Language :: Python",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        ],
+      long_description = readme + '\n\n' + history,
       keywords='',
       author='',
       author_email='',
@@ -22,24 +45,17 @@ setup(name='dolmen.forms.crud',
       namespace_packages=['dolmen', 'dolmen.forms'],
       include_package_data=True,
       zip_safe=False,
-      install_requires=[
-          'setuptools',
-          'grokcore.security',
-          'grokcore.component',
-          'dolmen.content',
-          'dolmen.forms.base',
-          'zope.event',
-          'zope.schema',
-          'zope.location',
-          'zope.security',
-          'zope.component',
-          'zope.interface',
-          'zope.configuration',
-          'zope.lifecycleevent',
-          'zope.cachedescriptors',
-          'megrok.z3cform.base',
-      ],
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
+      tests_require = tests_require,
+      install_requires = install_requires,
+      extras_require = {'test': tests_require},
+      test_suite="dolmen.forms.crud",
+      classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
+        'Framework :: Zope3',
+        'Intended Audience :: Other Audience',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+          ],
       )

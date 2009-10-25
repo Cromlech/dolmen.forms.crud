@@ -4,7 +4,7 @@ import grokcore.component as grok
 from zope.component import getAdapters
 from zope.lifecycleevent import ObjectModifiedEvent
 from dolmen.content import IBaseContent
-from dolmen.forms.crud import IFieldUpdate
+from dolmen.forms.base import IFieldUpdate
 
 
 @grok.subscribe(IBaseContent, ObjectModifiedEvent)
@@ -17,6 +17,6 @@ def notify_fields_update(ob, event):
         for name in desc.attributes:
             field = desc.interface[name]
             handlers = getAdapters((ob, field), IFieldUpdate)
-            for name, handler in handlers:
-                handler.update()
-                
+            for handler in handlers:
+                # Iteration through the generator
+                pass
