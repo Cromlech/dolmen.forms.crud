@@ -208,8 +208,6 @@ Edit form
   >>> [field for field in editform.fields]
   ['title', 'water']
 
-XXX NEED TO TEST THE EVENTS
-
 
 Display form
 ------------
@@ -282,3 +280,9 @@ Form customization
   >>> view.updateForm()
   >>> [field for field in view.fields]
   ['title', 'water']
+
+
+Events and field update subscribers
+===================================
+
+XXX NEED TO TEST THE EVENTS
