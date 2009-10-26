@@ -2,8 +2,8 @@
 
 from zope.event import notify
 from zope.lifecycleevent import Attributes
+from zope.component import getGlobalSiteManager
 from zope.interface import implementedBy, providedBy
-from zope.component import queryMultiAdapter, getGlobalSiteManager
 from dolmen.forms.crud import ObjectInitializedEvent
 from megrok.z3cform.base.utils import set_fields_data
 
