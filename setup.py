@@ -10,7 +10,7 @@ install_requires = [
     'setuptools',
     'grokcore.security',
     'grokcore.component',
-    'grokcore.viewlet'
+    'grokcore.viewlet',
     'zope.event',
     'zope.schema',
     'zope.location',
