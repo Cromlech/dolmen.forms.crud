@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import grokcore.component as grok
-from zope.interface import Interface
 from dolmen.forms.base import IForm
 from dolmen.forms.crud import IFieldsCustomization
 
 
 class FieldsCustomizer(grok.MultiAdapter):
     grok.baseclass()
-    grok.adapts(Interface, IForm, Interface)
+    grok.adapts(None, IForm, None)
     grok.implements(IFieldsCustomization)
 
     def __init__(self, context, form, request):

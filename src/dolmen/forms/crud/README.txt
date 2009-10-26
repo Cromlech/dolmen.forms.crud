@@ -2,30 +2,26 @@
 dolmen.forms.crud
 =================
 
-`dolmen.forms.crud` is module destined to help developpers create
-their C.R.U.D forms using `Grok`, `megrok.z3cform` and
-`dolmen.content`. It provides a collection of base classes to add,
-edit and access your content. It also provides some hooks to customize
-the fields per context and form using special adapters, to avoid
-overriding existing form and to increase the pluggability of your
-applications.
+`dolmen.forms.crud` is a module which helps developers create their
+C.R.U.D forms using `Grok`, `megrok.z3cform` and `dolmen.content`. It
+provides a collection of base classes to add, edit, and access
+content. It provides adapters to customize the fields of a form.
 
 
 Adding view
 ===========
 
 `dolmen.forms.crud` provides an abstraction for the 'adding'
-action. It allows pluggability at the container level and does handle
-the naming/persistence duet. More explicitly, it's a named adapter
-that will query the AddForm, call the object checking methods, choose
-a name using a INameChooser and finally, if everything went smoothly,
-set it on the context.
+action. It allows pluggability at the container level and handles
+naming and persistence. More explicitly, it's a named adapter that
+will query the add form, check the constraints, choose a name (using a
+INameChooser) and finally, if everything went smoothly, add it on the
+context.
 
-A base AddView is registered out-of-the-box as a named traversable
+A base adding view is registered out-of-the-box as a named traversable
 adapter called 'add'. It uses the following pattern:
 ++add++factory_name. `factory_name` must be the name of a
 `dolmen.content.IFactory` component.
-
 
 Let's first create a container in which we'll test the adding view::
 
@@ -41,8 +37,7 @@ Let's first create a container in which we'll test the adding view::
   >>> root = getRootFolder()
   >>> root['sietch'] = sietch
 
-
-The container created, the adding view should be available and operational.
+With the container created, the adding view should be available and operational.
 Let's have a quick overview::
     
   >>> from zope.component import getMultiAdapter
@@ -53,7 +48,7 @@ Let's have a quick overview::
   <dolmen.forms.crud.addview.Adder object at ...>
 
 
-The adding view component checks explicitly the security requirement
+The adding view component explicitly checks the security requirement
 on the factory. To test that behavior, we set up two
 accounts. 'zope.manager' has all the permissions granted while
 'zope.manfred' only has the 'zope.View' credentials. Our factory
@@ -73,8 +68,8 @@ called. Let's try to access it with Manfred::
   Unauthorized: <class 'dolmen.forms.crud.tests.Fremen'> requires the 'zope.ManageContent' permission.
   >>> security.endInteraction()
 
-We are not authorized. Now, if we try to access it with the Manager,
-we should access it with success::
+Manfred is not authorized, however Manager should successfully be able
+to access the addingview::
 
   >>> security.newInteraction(Participation(manager))
   >>> addingview.traverse('fremen', [])
@@ -82,12 +77,12 @@ we should access it with success::
   ...
   NotFound: Object: <dolmen.forms.crud.tests.Sietch object at ...>, name: 'fremen'
 
-The adding view is available for our item. Though, if we try to access our
-current factory, a NotFound error will be raised as we have no add form
-registered.
+The adding view is available for our item. Though, as we have no add form
+registered, a NotFound error will be raised if we try to access our
+current factory.
 
-Let's try to check, now, if we create and register a very basic generic crud
-AddForm::
+Let's create and register a very basic generic crud
+add form::
 
   >>> import dolmen.forms.crud as crud
   >>> class AddForm(crud.Add):
@@ -102,7 +97,7 @@ AddForm::
   >>> addform
   <AddForm object at ...>
 
-Here we go. Our AddForm is returned as we traverse toward the factory
+Our AddForm is returned as we traverse toward the factory
 'fremen'.
 
 Perfect. Our adding view is ready to be used. Before testing the AddForm
@@ -127,9 +122,9 @@ An IAdding component should always be locatable::
   >>> addingview.__name__
   u''
 
-The `add` method checks if the constraints are respected. If the container has
-a defined restriction (using zope.app.container.constraints), we get an error
-if the contract is violated::
+The `add` method checks if the constraints are respected. If the
+container has defined restrictions or if some interface contract is
+violated, we get an error::
 
   >>> from dolmen.forms.crud.tests import Harkonnen
 
@@ -140,26 +135,26 @@ if the contract is violated::
   InvalidItemType: (<...Sietch object at ...>, <...Harkonnen object at ...>, (<InterfaceClass dolmen.forms.crud.tests.IDesertWarrior>,))
 
 
-The `add` method of the adding view can be called from the AddForm, to delegate
+The `add` method of the adding view can be called from the AddForm to delegate
 the adding operation. The generic adding view already handles the common
-operations such as naming and persistence. Still, our AddForm is responsible
-of the factoring of the item. Let's test very quickly the important attributes
+operations such as naming and persistence. Still, our add form is responsible
+for the factoring of the item. Let's test the important attributes
 and methods::
 
-  >>> addform.update()
-  >>> addform.updateForm()
-  >>> addform.fields
-  <z3c.form.field.Fields object at ...>
+  >>> addform.fields.keys()
+  ['title', 'water']
+
   >>> fremen = addform.create({'title': u'Chani', 'water': 5})
   >>> fremen
   <dolmen.forms.crud.tests.Fremen object at ...>
+
   >>> fremen.title
   u'Chani'
   >>> fremen.water
   5
 
 The adding view works as intended. The real interest in using such an
-abstraction is to be able to easily switch adding behaviors just by
+abstraction is the ease with which you can switch adding behaviors, just by
 registering a new component.
 
 
@@ -174,7 +169,7 @@ Create
 ------
 
 The add form implementation is tightly tied to the adding view. As the add
-form behavior has been mostly covered above, we'll only test briefly the
+form behavior has been mostly covered above, we'll only test the
 presence of the fields and the label on the form itself::
 
   >>> addform = addingview.traverse('fremen', [])
@@ -293,7 +288,7 @@ it's an adapter that allows you to interact at the field level.
 
 In a `IFieldsCustomization`, the customization happens at the __call__
 level. The forms, while they update the objects fields, query a
-`IFieldsCustomization` adapter and call it, giving the fields as
+`IFieldsCustomization` adapter and call it, giving the fields as an
 argument.
 
 Let's implement an example::
@@ -320,7 +315,7 @@ We can now register and test the customization::
 
 One important thing is noticeable here : the 'RemoveWater' adapter was
 registered for the 'Fremen' component. To be able to lookup the
-registery for suitable adapters, the Add form uses a special lookup
+registery for suitable adapters, the add form uses a special lookup
 function : `dolmen.forms.crud.utils.queryClassMultiAdapter`.
 
 We can test a more complex example, returning a brand new instance of
@@ -369,8 +364,8 @@ logging list and a generic handler::
 Adding events
 -------------
 
-While an object is created using an Add form, two main events
-are fired, in order to notify the lifecycle handlers::
+In order to notify the lifecycle handlers, two main events
+are fired while an object is created using an add form::
 
   >>> arrakin = root['arrakin'] = dolmen.content.Container()
   >>> addingview = getMultiAdapter((arrakin, request), name='add')
@@ -443,7 +438,7 @@ Field update
 `dolmen.forms.base` provides the description of a new component that
 can be used to atomize the updating process of an object:
 `IFieldUpdate`. An implementation is available in `dolmen.forms.crud`,
-using an event handler, plugged on ObjectModifiedEvent and
+using an event handler, listening on ObjectModifiedEvent and
 ObjectInitializedEvent::
 
   >>> updates = []
@@ -461,8 +456,7 @@ ObjectInitializedEvent::
   >>> provideAdapter(updated_textfield, name="updatetext")
 
 
-By creating a content, we can check if the add form queries the
-IFieldUpdate component correctly::
+Using an add form, the IFieldUpdate adapters should be called during an objects creation::
 
   >>> desert = root['desert'] = dolmen.content.Container()
   >>> addingview = getMultiAdapter((desert, request), name='add')
@@ -492,7 +486,7 @@ We can do the same thing for the edit form::
   >>> updates
   [(<dolmen.forms.crud.tests.Fremen object at ...>, <zope.schema._bootstrapfields.TextLine object at ...>)]
 
-Updating a field with no registered IFieldUpdate adapter shouldn't do
+Updating a field without a registered IFieldUpdate adapter shouldn't do
 anything::
 
  >>> updates = []
@@ -507,4 +501,3 @@ anything::
 
   >>> updates
   []
-  
