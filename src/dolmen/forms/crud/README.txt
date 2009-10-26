@@ -87,7 +87,7 @@ current factory, a NotFound error will be raised as we have no add form
 registered.
 
 Let's try to check, now, if we create and register a very basic generic crud
-AddForm:
+AddForm::
 
   >>> import dolmen.forms.crud as crud
   >>> class AddForm(crud.Add):
@@ -98,8 +98,8 @@ AddForm:
   >>> grokcore.component.testing.grok_component('addform', AddForm)
   True
 
-  >>> form = addingview.traverse('fremen', [])
-  >>> form
+  >>> addform = addingview.traverse('fremen', [])
+  >>> addform
   <AddForm object at ...>
 
 Here we go. Our AddForm is returned as we traverse toward the factory
@@ -129,7 +129,7 @@ An IAdding component should always be locatable::
 
 The `add` method checks if the constraints are respected. If the container has
 a defined restriction (using zope.app.container.constraints), we get an error
-if the contract is violated.
+if the contract is violated::
 
   >>> from dolmen.forms.crud.tests import Harkonnen
 
@@ -144,37 +144,38 @@ The `add` method of the adding view can be called from the AddForm, to delegate
 the adding operation. The generic adding view already handles the common
 operations such as naming and persistence. Still, our AddForm is responsible
 of the factoring of the item. Let's test very quickly the important attributes
-and methods :
+and methods::
 
-  >>> form.update()
-  >>> form.updateForm()
-  >>> form.fields
+  >>> addform.update()
+  >>> addform.updateForm()
+  >>> addform.fields
   <z3c.form.field.Fields object at ...>
-  >>> factored_item = form.create({'title': u'Shani', 'water': 5})
-  >>> factored_item
+  >>> fremen = addform.create({'title': u'Chani', 'water': 5})
+  >>> fremen
   <dolmen.forms.crud.tests.Fremen object at ...>
-  >>> factored_item.title
-  u'Shani'
-  >>> factored_item.water
+  >>> fremen.title
+  u'Chani'
+  >>> fremen.water
   5
 
 The adding view works as intended. The real interest in using such an
 abstraction is to be able to easily switch adding behaviors just by
 registering a new component.
 
-  >>> addingview.nextURL()
-  'http://127.0.0.1/sietch'
-
 
 Generic forms
 =============
- 
-Add form
---------
 
-The add form implementation is tightly tied to the adding view. The add
-form behavior has been mostly covered above. Let's test briefly the
-presence of the fields and the label::
+`dolmen.forms.crud` provides a set of ready-to-use base classes that
+will auto-generate forms based on `dolmen.content` schemas.
+
+
+Create
+------
+
+The add form implementation is tightly tied to the adding view. As the add
+form behavior has been mostly covered above, we'll only test briefly the
+presence of the fields and the label on the form itself::
 
   >>> addform = addingview.traverse('fremen', [])
   >>> addform
@@ -183,34 +184,18 @@ presence of the fields and the label::
   >>> print addform.label
   Fremen training camp
 
-  >>> addform.update()
+  >>> addform.fields.keys()
+  ['title', 'water']
+  
   >>> addform.updateForm()
-  >>> [field for field in addform.fields]
-  ['title', 'water']
-  
-
-Edit form
----------
-
-  >>> class EditForm(crud.Edit):
-  ...     '''Generic edit form.
-  ...     '''
-  
-  >>> grokcore.component.testing.grok_component('editform', EditForm)
-  True
-
-  >>> editform = getMultiAdapter((factored_item, request), name='editform')
-  >>> editform
-  <EditForm object at ...>
-
-  >>> editform.update()
-  >>> editform.updateForm()
-  >>> [field for field in editform.fields]
-  ['title', 'water']
+  >>> for action in addform.actions: print action
+  save
 
 
-Display form
-------------
+Read
+-----
+
+A special kind of form allows you display your content::
 
   >>> class DefaultView(crud.Display):
   ...     '''Generic display form.
@@ -219,70 +204,307 @@ Display form
   >>> grokcore.component.testing.grok_component('display', DefaultView)
   True
 
-  >>> view = getMultiAdapter((factored_item, request), name='defaultview')
+  >>> view = getMultiAdapter((fremen, request), name='defaultview')
   >>> view
   <DefaultView object at ...>
 
-  >>> view.update()
-  >>> view.updateForm()
-  >>> [field for field in view.fields]
+The Display form removes the 'title' from the list of fields. This
+particular attribute is used directly by the template::
+
+  >>> view.fields.keys()
   ['water']
+
+A display form has no actions::
+
+  >>> view.updateForm()
+  >>> for action in view.actions: print action
+  Traceback (most recent call last):
+  ...
+  AttributeError: 'DefaultView' object has no attribute 'actions'
+
+`dolmen.forms.crud` provides a very basic template for that form. As
+we can see, the title attribute is used as the HTML header (h1) of the
+page::
 
   >>> print view()
   <div class="defaultview">
-    <h1>Shani</h1>
-  <BLANKLINE>
-  <BLANKLINE>
-      <div class="field">
-       <label for="form-widgets-water">
-  	<span>Number water gallons owned</span>
-       </label>
-       <p class="discreet"></p>
-       <div class="widget">
-      <span id="form-widgets-water"
-            class="text-widget required int-field">5</span>
-  <BLANKLINE>
-  </div>
+    <h1>Chani</h1>
+    <div class="field">
+      <label for="form-widgets-water">
+        <span>Number water gallons owned</span>
+      </label>
+      <p class="discreet"></p>
+      <div class="widget">
+        <span id="form-widgets-water"
+              class="text-widget required int-field">5</span>
       </div>
-  <BLANKLINE>
+    </div>
   </div>
-  <BLANKLINE>
 
+
+Update
+------
+
+An edit form can be registered simply by sublassing the Edit base class::
+
+  >>> class EditForm(crud.Edit):
+  ...     '''Generic edit form.
+  ...     '''
+  ...     def nextURL(self):
+  ...         return u"We don't have a persistent data."
+
+  >>> grokcore.component.testing.grok_component('editform', EditForm)
+  True
+
+This form registered, we can check if all the fields are ready to be
+edited::
+
+  >>> request = TestRequest(form={
+  ...     'form.widgets.water': '25',
+  ...     'form.widgets.title': u'Stilgar',
+  ...     'form.buttons.apply': u'Apply'}
+  ...     )
+
+  >>> editform = getMultiAdapter((fremen, request), name='editform')
+  >>> editform
+  <EditForm object at ...>
+
+  >>> editform.updateForm()
+  >>> for action in editform.actions: print action
+  apply
+
+  >>> editform.fields.keys()
+  ['title', 'water']
+
+The values should now be set::
+
+  >>> fremen.title
+  u'Stilgar'
+  >>> fremen.water
+  25
 
 Form customization
 ==================
 
+To customize forms, the usual solution is to subclass them and to work
+with the subclass. `dolmen.forms.crud` proposes a new component to
+customize your forms. Defined by the `IFieldsCustomization` interface,
+it's an adapter that allows you to interact at the field level.
+
+In a `IFieldsCustomization`, the customization happens at the __call__
+level. The forms, while they update the objects fields, query a
+`IFieldsCustomization` adapter and call it, giving the fields as
+argument.
+
+Let's implement an example::
+
   >>> class RemoveWater(crud.FieldsCustomizer):
   ...    grokcore.component.adapts(Fremen, crud.Add, None)
+  ...
   ...    def __call__(self, fields):
+  ...       """Alters the form fields"""
   ...       return fields.omit('water')
+
+  >>> from zope.interface import verify
+  >>> verify.verifyClass(crud.IFieldsCustomization, RemoveWater)
+  True
+
+We can now register and test the customization::
 
   >>> grokcore.component.testing.grok_component('custom', RemoveWater)
   True
 
   >>> addform = addingview.traverse('fremen', [])
-  >>> [field for field in addform.fields]
-  ['title']
+  >>> for field in addform.fields: print field
+  title
 
+One important thing is noticeable here : the 'RemoveWater' adapter was
+registered for the 'Fremen' component. To be able to lookup the
+registery for suitable adapters, the Add form uses a special lookup
+function : `dolmen.forms.crud.utils.queryClassMultiAdapter`.
+
+We can test a more complex example, returning a brand new instance of
+Fields::
 
   >>> import dolmen.forms.base
   >>> class AddFieldToView(crud.FieldsCustomizer):
   ...    grokcore.component.adapts(Fremen, crud.Display, None)
+  ...
   ...    def __call__(self, fields):
+  ...       """Returns a new instance of Fields.
+  ...       """
   ...       schema = dolmen.content.schema.bind().get(self.context)
   ...       return dolmen.forms.base.Fields(*schema)
 
   >>> grokcore.component.testing.grok_component('viewer', AddFieldToView)
   True
 
-  >>> view = getMultiAdapter((factored_item, request), name='defaultview')
-  >>> view.update()
-  >>> view.updateForm()
-  >>> [field for field in view.fields]
+Checking the fields, we should get *all* the fields defined by the
+Fremen schema::
+
+  >>> view = getMultiAdapter((fremen, request), name='defaultview')
+  >>> view.fields.keys()
   ['title', 'water']
 
 
-Events and field update subscribers
-===================================
+Events and field updates
+========================
 
-XXX NEED TO TEST THE EVENTS
+When using the generic `dolmen.forms.crud` forms, some events are
+triggered for you. They represent the lifecycle of the manipulated object.
+
+To check on all the events triggered, we can set up a simple event
+logging list and a generic handler::
+
+  >>> from zope.component import provideHandler
+  >>> from zope.component.interfaces import IObjectEvent
+  >>> logger = []
+  
+  >>> def event_logger(object, event):
+  ...   logger.append(event)
+
+  >>> provideHandler(event_logger, (Fremen, IObjectEvent))
+
+
+Adding events
+-------------
+
+While an object is created using an Add form, two main events
+are fired, in order to notify the lifecycle handlers::
+
+  >>> arrakin = root['arrakin'] = dolmen.content.Container()
+  >>> addingview = getMultiAdapter((arrakin, request), name='add')
+  >>> addform = addingview.traverse('fremen', [])
+
+  >>> chani = addform.createAndAdd({'title': u'Chani'})
+
+We iterate through the logger to check the events triggered during the
+object creation::
+
+  >>> for event in logger: print event
+  <dolmen.forms.crud.events.ObjectInitializedEvent object at ...> 
+  <zope.app.container.contained.ObjectAddedEvent object at ...>
+    
+We can see that there is no `zope.lifecycleevent.ObjectCreatedEvent`
+fired. Instead, we have a `dolmen.forms.crud.ObjectInitializedEvent`.
+Let's have a closer look at this homegrown event::
+
+  >>> from zope.lifecycleevent import IObjectCreatedEvent
+  >>> init_event = logger[0]
+
+  >>> IObjectCreatedEvent.providedBy(init_event)
+  True
+
+  >>> for desc in init_event.descriptions:
+  ...   print "%r: %s" % (desc.interface, desc.attributes)
+  <InterfaceClass dolmen.content.interfaces.IBaseContent>: ('title',)
+  
+
+Editing events
+--------------
+
+Let's have the same introspection check with the edit form::
+
+  >>> logger = []
+
+We provide data for the update::
+
+  >>> request = TestRequest(form={
+  ...     'form.widgets.water': '10',
+  ...     'form.widgets.title': u'Sihaya',
+  ...     'form.buttons.apply': u'Apply'}
+  ...     )
+
+  >>> editform = getMultiAdapter((chani, request), name='editform')
+  >>> editform.updateForm()
+
+We check the trigged events::
+
+  >>> for event in logger: print event
+  <zope.app.event.objectevent.ObjectModifiedEvent object at ...>
+
+In depth, we can check if the updated fields are correctly set in the
+event's descriptions::
+
+  >>> for desc in logger[0].descriptions:
+  ...   print "%r: %s" % (desc.interface, desc.attributes)
+  <InterfaceClass dolmen.forms.crud.tests.IDesertWarrior>: ('water',)
+  <InterfaceClass dolmen.content.interfaces.IBaseContent>: ('title',)
+
+  >>> chani.title
+  u'Sihaya'
+  >>> chani.water
+  10
+
+
+Field update
+------------
+
+`dolmen.forms.base` provides the description of a new component that
+can be used to atomize the updating process of an object:
+`IFieldUpdate`. An implementation is available in `dolmen.forms.crud`,
+using an event handler, plugged on ObjectModifiedEvent and
+ObjectInitializedEvent::
+
+  >>> updates = []
+
+  >>> from zope.schema import TextLine
+  >>> from zope.component import adapter, provideAdapter
+  >>> from zope.interface import implementer
+  >>> from dolmen.forms.base import IFieldUpdate
+
+  >>> @implementer(IFieldUpdate)
+  ... @adapter(Fremen, TextLine)
+  ... def updated_textfield(field, context):
+  ...    updates.append((field, context))
+
+  >>> provideAdapter(updated_textfield, name="updatetext")
+
+
+By creating a content, we can check if the add form queries the
+IFieldUpdate component correctly::
+
+  >>> desert = root['desert'] = dolmen.content.Container()
+  >>> addingview = getMultiAdapter((desert, request), name='add')
+  >>> addform = addingview.traverse('fremen', [])
+
+  >>> kynes = addform.createAndAdd({'title': u'liet'})
+  >>> print updates
+  [(<dolmen.forms.crud.tests.Fremen object at ...>, <zope.schema._bootstrapfields.TextLine object at ...>)]
+
+
+We can do the same thing for the edit form::
+
+  >>> updates = []
+
+  >>> request = TestRequest(form={
+  ...     'form.widgets.water': '50',
+  ...     'form.widgets.title': u'Imperial weather specialist',
+  ...     'form.buttons.apply': u'Apply'}
+  ...     )
+
+  >>> editform = getMultiAdapter((kynes, request), name='editform')
+  >>> editform.updateForm()
+
+  >> kynes.title
+  u'Imperial weather specialist'
+
+  >>> updates
+  [(<dolmen.forms.crud.tests.Fremen object at ...>, <zope.schema._bootstrapfields.TextLine object at ...>)]
+
+Updating a field with no registered IFieldUpdate adapter shouldn't do
+anything::
+
+ >>> updates = []
+
+  >>> request = TestRequest(form={
+  ...     'form.widgets.water': '40',
+  ...     'form.buttons.apply': u'Apply'}
+  ...     )
+
+  >>> editform = getMultiAdapter((kynes, request), name='editform')
+  >>> editform.updateForm()
+
+  >>> updates
+  []
+  

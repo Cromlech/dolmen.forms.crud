@@ -2,9 +2,10 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:grok="http://namespaces.zope.org/grok">
 
-  <include package="megrok.z3cform.base" />
   <include package="megrok.z3cform.base" file="meta.zcml" />
   <include package="megrok.pagetemplate" file="meta.zcml" />
+
+  <include package="megrok.z3cform.base" />
   <include package="dolmen.content" />
   <grok:grok package="." />
 

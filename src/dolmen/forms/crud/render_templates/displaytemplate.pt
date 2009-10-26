@@ -1,17 +1,13 @@
 <div class="defaultview">
   <h1 tal:condition="view/label" tal:content="view/label" />
- 
-  <tal:block tal:repeat="widget view/widgets/values">
-    <div class="field"
-	 tal:define="widget_odd repeat/widget/odd;
-		     description  widget/field/description;">
-      <label tal:condition="widget/label"
-	     tal:attributes="for widget/id">
-	<span i18n:translate=""
-	      tal:content="widget/label">label</span>
-      </label>
-      <p class="discreet" tal:content="description" />
-      <div class="widget" tal:content="structure widget/render" />
-    </div>
-  </tal:block>
+  <div class="field"
+       tal:repeat="widget view/widgets/values">
+    <label tal:condition="widget/label"
+	   tal:attributes="for widget/id">
+      <span i18n:translate=""
+	    tal:content="widget/label">label</span>
+    </label>
+    <p class="discreet" tal:content="widget/field/description" />
+    <div class="widget" tal:content="structure widget/render" />
+  </div>
 </div>

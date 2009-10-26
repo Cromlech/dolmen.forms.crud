@@ -4,6 +4,7 @@ import dolmen.content
 from zope.schema import Object
 from zope.location.interfaces import ILocation
 from zope.interface import Interface, Attribute
+from zope.lifecycleevent.interfaces import IObjectCreatedEvent
 
 
 class IAdding(ILocation):
@@ -25,6 +26,11 @@ class IFactoryAdding(IAdding):
         )
 
 
+class IObjectInitializedEvent(IObjectCreatedEvent):
+    """An object has been created and all the fields received their values.
+    """
+
+
 class IFieldsCustomization(Interface):
     """Defines a form customization. A form customization is an adapter
     that allows to modify the fields of a form and their rendering.
@@ -32,3 +38,8 @@ class IFieldsCustomization(Interface):
     context = Attribute("The context of the customized form")
     request = Attribute("The HTTP request")
     form = Attribute("The form object")
+
+    def __call__(fields):
+        """Must returns an instance of z3c.form.Fields or a modified
+        versions of the original fields arg.
+        """

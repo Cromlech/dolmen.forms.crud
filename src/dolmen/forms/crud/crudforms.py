@@ -4,9 +4,7 @@ import grokcore.security as grok
 
 import dolmen.content as content
 import dolmen.forms.base as form
-from dolmen.forms.crud import interfaces as crud
-from dolmen.forms.crud.utils import queryClassMultiAdapter
-from z3c.form.interfaces import IForm, IEditForm, IDisplayForm
+from dolmen.forms.crud import utils, interfaces as crud
 
 from zope.event import notify
 from zope.i18nmessageid import MessageFactory
@@ -39,7 +37,7 @@ class Add(form.PageAddForm):
         ifaces = self.context.factory.getSchema()
         fields = form.Fields(*ifaces).omit('__parent__')
         
-        modifier = queryClassMultiAdapter(
+        modifier = utils.queryClassMultiAdapter(
             (self.context.factory.factory, self, self.request),
             self.context,
             crud.IFieldsCustomization
@@ -52,13 +50,17 @@ class Add(form.PageAddForm):
     def nextURL(self):
         return self.context.nextURL()
 
+    def createAndAdd(self, data):
+        obj = self.create(data)
+        self.add(obj)
+        return obj
+
     def add(self, object):
         return self.context.add(object)
 
     def create(self, data):
         obj = self.context.factory()
-        notify(ObjectCreatedEvent(obj))
-        form.apply_data_event(self.fields, obj, data)
+        utils.notify_object_creation(self.fields, obj, data)
         return obj
 
     @form.button.buttonAndHandler(_('Save'), name='save')
@@ -75,7 +77,7 @@ class Add(form.PageAddForm):
 class Edit(form.PageEditForm):
     grok.baseclass()
     grok.context(content.IBaseContent)
-    form.extends(form.PageEditForm)
+    form.extends(form.PageEditForm, ignoreButtons=True)
     
     form_name = _(u"Edit")
 
@@ -83,6 +85,9 @@ class Edit(form.PageEditForm):
     def label(self):
         return _(u"edit_action", default=u"Edit: $name",
                  mapping={"name": self.context.title})
+
+    def nextURL(self):
+        return self.url(self.context)
 
     @CachedProperty
     def fields(self):
@@ -107,10 +112,10 @@ class Edit(form.PageEditForm):
             return
         changes = form.apply_data_event(self.fields, self.context, data)
         if changes:
-            self.flash(self.successMessage)
+            self.status = self.successMessage
         else:
-            self.flash(self.noChangesMessage)
-        self.redirect(self.url(self.context))
+            self.status = self.noChangesMessage
+        self.redirect(self.nextURL())
 
 
 class Display(form.PageDisplayForm):
