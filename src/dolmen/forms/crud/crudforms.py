@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import grokcore.security as grok
-
 import dolmen.content as content
 import dolmen.forms.base as form
-from dolmen.forms.crud import utils, interfaces as crud
+import grokcore.component as grok
 
-from zope.event import notify
+from zope.component import queryMultiAdapter
 from zope.i18nmessageid import MessageFactory
-from zope.security.interfaces import Unauthorized
-from zope.security.management import checkPermission
-from zope.component import queryMultiAdapter, getUtility
 from zope.cachedescriptors.property import CachedProperty
-from zope.lifecycleevent import Attributes, ObjectCreatedEvent
+from dolmen.forms.crud import utils, interfaces as crud
 
 _ = MessageFactory("dolmen")
 
