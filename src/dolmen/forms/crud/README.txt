@@ -144,13 +144,13 @@ and methods::
   >>> addform.fields.keys()
   ['title', 'water']
 
-  >>> fremen = addform.create({'title': u'Chani', 'water': 5})
-  >>> fremen
+  >>> chani = addform.create({'title': u'Chani', 'water': 5})
+  >>> chani
   <dolmen.forms.crud.tests.Fremen object at ...>
 
-  >>> fremen.title
+  >>> chani.title
   u'Chani'
-  >>> fremen.water
+  >>> chani.water
   5
 
 The adding view works as intended. The real interest in using such an
@@ -163,6 +163,13 @@ Generic forms
 
 `dolmen.forms.crud` provides a set of ready-to-use base classes that
 will auto-generate forms based on `dolmen.content` schemas.
+
+The context of the tests is out previously created content::
+
+  >>> naib
+  <dolmen.forms.crud.tests.Fremen object at ...>
+  >>> naib.__parent__
+  <dolmen.forms.crud.tests.Sietch object at ...>
 
 
 Create
@@ -187,6 +194,46 @@ presence of the fields and the label on the form itself::
   save
 
 
+Update
+------
+
+An edit form can be registered simply by sublassing the Edit base class::
+
+  >>> class EditForm(crud.Edit):
+  ...     '''Generic edit form.
+  ...     '''
+
+  >>> grokcore.component.testing.grok_component('editform', EditForm)
+  True
+
+This form registered, we can check if all the fields are ready to be
+edited::
+
+  >>> post = TestRequest(form={
+  ...     'form.widgets.water': '25',
+  ...     'form.widgets.title': u'Stilgar',
+  ...     'form.buttons.apply': u'Apply'}
+  ...     )
+
+  >>> editform = getMultiAdapter((naib, post), name='editform')
+  >>> editform
+  <dolmen.forms.crud.tests.EditForm object at ...>
+
+  >>> editform.updateForm()
+  >>> for action in editform.actions: print action
+  apply
+
+  >>> editform.fields.keys()
+  ['title', 'water']
+
+The values should now be set::
+
+  >>> naib.title
+  u'Stilgar'
+  >>> naib.water
+  25
+
+
 Read
 -----
 
@@ -199,7 +246,7 @@ A special kind of form allows you display your content::
   >>> grokcore.component.testing.grok_component('display', DefaultView)
   True
 
-  >>> view = getMultiAdapter((fremen, request), name='defaultview')
+  >>> view = getMultiAdapter((naib, request), name='defaultview')
   >>> view
   <dolmen.forms.crud.tests.DefaultView object at ...>
 
@@ -223,7 +270,7 @@ page::
 
   >>> print view()
   <div class="defaultview">
-    <h1>Chani</h1>
+    <h1>Stilgar</h1>
     <div class="field">
       <label for="form-widgets-water">
         <span>Number water gallons owned</span>
@@ -231,52 +278,10 @@ page::
       <p class="discreet"></p>
       <div class="widget">
         <span id="form-widgets-water"
-              class="text-widget required int-field">5</span>
+              class="text-widget required int-field">25</span>
       </div>
     </div>
   </div>
-
-
-Update
-------
-
-An edit form can be registered simply by sublassing the Edit base class::
-
-  >>> class EditForm(crud.Edit):
-  ...     '''Generic edit form.
-  ...     '''
-  ...     def nextURL(self):
-  ...         return u"We don't have a persistent data."
-
-  >>> grokcore.component.testing.grok_component('editform', EditForm)
-  True
-
-This form registered, we can check if all the fields are ready to be
-edited::
-
-  >>> request = TestRequest(form={
-  ...     'form.widgets.water': '25',
-  ...     'form.widgets.title': u'Stilgar',
-  ...     'form.buttons.apply': u'Apply'}
-  ...     )
-
-  >>> editform = getMultiAdapter((fremen, request), name='editform')
-  >>> editform
-  <dolmen.forms.crud.tests.EditForm object at ...>
-
-  >>> editform.updateForm()
-  >>> for action in editform.actions: print action
-  apply
-
-  >>> editform.fields.keys()
-  ['title', 'water']
-
-The values should now be set::
-
-  >>> fremen.title
-  u'Stilgar'
-  >>> fremen.water
-  25
 
 
 Delete
@@ -288,13 +293,11 @@ A delete form is a simple form with no fields, that only provides a
   >>> class DeleteForm(crud.Delete):
   ...     '''Generic delete form.
   ...     '''
-  ...     def nextURL(self):
-  ...         return u"We don't have a persistent data."
 
   >>> grokcore.component.testing.grok_component('delete_form', DeleteForm)
   True
 
-  >>> deleteform = getMultiAdapter((fremen, request), name='deleteform')
+  >>> deleteform = getMultiAdapter((naib, request), name='deleteform')
   >>> deleteform
   <dolmen.forms.crud.tests.DeleteForm object at ...>
 
@@ -314,12 +317,19 @@ When confirmed, the form tries to delete the object::
   >>> list(sietch.keys())
   [u'Fremen']
 
-  >>> victim = sietch['Fremen']
-  >>> deleteform = getMultiAdapter((victim, post), name='deleteform')
+  >>> deleteform = getMultiAdapter((naib, post), name='deleteform')
   >>> deleteform.updateForm()
   
+  >>> deleteform.status
+  u'This object has been deleted'
+
   >>> list(sietch.keys())
   []
+
+  >>> deleteform.response.getStatus()
+  302
+  >>> deleteform.response.getHeader('location')
+  'http://127.0.0.1/sietch'
 
 
 Form customization
@@ -381,7 +391,7 @@ Fields::
 Checking the fields, we should get *all* the fields defined by the
 Fremen schema::
 
-  >>> view = getMultiAdapter((fremen, request), name='defaultview')
+  >>> view = getMultiAdapter((naib, request), name='defaultview')
   >>> view.fields.keys()
   ['title', 'water']
 

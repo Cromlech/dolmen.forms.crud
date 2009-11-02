@@ -147,29 +147,26 @@ class Delete(form.PageForm):
     form_name = _(u"Are you really sure ?")
     fields = {}
 
+    successMessage = _("This object has been deleted")
+    failureMessage = _("This object could not be deleted")
+
     _deleted = False
     
-    def delete(self):
+    @form.button.buttonAndHandler(_('Confirm'), name='confirm')
+    def handleConfirm(self, action):
         container = self.context.__parent__
         name = self.context.__name__
+        
         if name in container:
             try:
                 del container[name]
                 self._deleted = True
-                return self._deleted
             except ValueError, e:
                 pass
-        self._deleted = False
-        return self._deleted
-
-    def nextURL(self):
-        if self._deleted == False:
-            return self.url(self.context)
-        self.redirect(self.url(self.context))
-
-    @form.button.buttonAndHandler(_('Confirm'), name='confirm')
-    def handleConfirm(self, action):
-        result = self.delete()
-        if result is False:
-            self.status = _("This object could not be deleted")
-        self.redirect(self.nextURL())
+        
+        if self._deleted is True:
+            self.status = self.successMessage
+            self.redirect(self.url(container))
+        else:
+            self.status = self.failureMessage
+            self.redirect(self.url(self.context))
