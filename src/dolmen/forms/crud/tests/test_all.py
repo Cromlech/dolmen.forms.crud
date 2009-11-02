@@ -14,7 +14,10 @@ FunctionalLayer = functional.ZCMLLayer(
 
 def test_suite():
     suite = unittest.TestSuite()
-    readme = functional.FunctionalDocFileSuite('../README.txt')
+    readme = functional.FunctionalDocFileSuite(
+        '../README.txt',
+        globs={'__name__': 'dolmen.forms.crud.tests'}
+        )
     readme.layer = FunctionalLayer
     suite.addTest(readme)
     return suite

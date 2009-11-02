@@ -95,7 +95,7 @@ add form::
 
   >>> addform = addingview.traverse('fremen', [])
   >>> addform
-  <AddForm object at ...>
+  <dolmen.forms.crud.tests.AddForm object at ...>
 
 Our AddForm is returned as we traverse toward the factory
 'fremen'.
@@ -174,7 +174,7 @@ presence of the fields and the label on the form itself::
 
   >>> addform = addingview.traverse('fremen', [])
   >>> addform
-  <AddForm object at ...>
+  <dolmen.forms.crud.tests.AddForm object at ...>
 
   >>> print addform.label
   Fremen training camp
@@ -201,7 +201,7 @@ A special kind of form allows you display your content::
 
   >>> view = getMultiAdapter((fremen, request), name='defaultview')
   >>> view
-  <DefaultView object at ...>
+  <dolmen.forms.crud.tests.DefaultView object at ...>
 
 The Display form removes the 'title' from the list of fields. This
 particular attribute is used directly by the template::
@@ -262,7 +262,7 @@ edited::
 
   >>> editform = getMultiAdapter((fremen, request), name='editform')
   >>> editform
-  <EditForm object at ...>
+  <dolmen.forms.crud.tests.EditForm object at ...>
 
   >>> editform.updateForm()
   >>> for action in editform.actions: print action
@@ -277,6 +277,50 @@ The values should now be set::
   u'Stilgar'
   >>> fremen.water
   25
+
+
+Delete
+------
+
+A delete form is a simple form with no fields, that only provides a
+'confirm' action::
+
+  >>> class DeleteForm(crud.Delete):
+  ...     '''Generic delete form.
+  ...     '''
+  ...     def nextURL(self):
+  ...         return u"We don't have a persistent data."
+
+  >>> grokcore.component.testing.grok_component('delete_form', DeleteForm)
+  True
+
+  >>> deleteform = getMultiAdapter((fremen, request), name='deleteform')
+  >>> deleteform
+  <dolmen.forms.crud.tests.DeleteForm object at ...>
+
+  >>> deleteform.updateForm()
+  >>> for action in deleteform.actions: print action
+  confirm
+
+  >>> deleteform.fields
+  {}
+
+When confirmed, the form tries to delete the object::
+
+  >>> post = TestRequest(form={
+  ...     'form.buttons.confirm': u'Confirm'}
+  ...     )
+
+  >>> list(sietch.keys())
+  [u'Fremen']
+
+  >>> victim = sietch['Fremen']
+  >>> deleteform = getMultiAdapter((victim, post), name='deleteform')
+  >>> deleteform.updateForm()
+  
+  >>> list(sietch.keys())
+  []
+
 
 Form customization
 ==================
@@ -416,7 +460,7 @@ We provide data for the update::
 We check the trigged events::
 
   >>> for event in logger: print event
-  <zope.app.event.objectevent.ObjectModifiedEvent object at ...>
+  <...ObjectModifiedEvent object at ...>
 
 In depth, we can check if the updated fields are correctly set in the
 event's descriptions::

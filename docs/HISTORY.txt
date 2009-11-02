@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.2 (2009-11-02)
+----------------
+
+* Added a DeleteForm
+* Added titles to all the forms
+* Corrected double nextURL method in the EditForm.
+
+
 0.1 (2009-10-26)
 ----------------
 

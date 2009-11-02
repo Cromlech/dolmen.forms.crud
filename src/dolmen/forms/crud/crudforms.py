@@ -18,6 +18,7 @@ class Add(form.PageAddForm):
     is respected on the context.
     """
     grok.baseclass()
+    grok.title(_(u"Add"))
     grok.name('dolmen.add')
     grok.context(crud.IFactoryAdding)
 
@@ -71,6 +72,7 @@ class Add(form.PageAddForm):
 
 class Edit(form.PageEditForm):
     grok.baseclass()
+    grok.title(_(u"Edit"))
     grok.context(content.IBaseContent)
     form.extends(form.PageEditForm, ignoreButtons=True)
     
@@ -96,9 +98,6 @@ class Edit(form.PageEditForm):
             return modifier(fields)
         return fields
 
-    def nextURL(self):
-        return self.redirect(self.url(self.context))
-
     @form.button.buttonAndHandler(_('Apply'), name='apply')
     def handleApply(self, action):
         data, errors = self.extractData()
@@ -115,6 +114,7 @@ class Edit(form.PageEditForm):
 
 class Display(form.PageDisplayForm):
     grok.baseclass()
+    grok.title(_(u"View"))
     grok.context(content.IBaseContent)
 
     ignoreContext = False
@@ -134,3 +134,42 @@ class Display(form.PageDisplayForm):
         if modifier is not None:
             return modifier(fields)
         return fields
+
+
+class Delete(form.PageForm):
+    """A confirmation for to delete an object.
+    """
+    grok.baseclass()
+    grok.title(_(u"Delete"))
+    grok.context(content.IBaseContent)
+
+    label = _(u"Confirm deletion")
+    form_name = _(u"Are you really sure ?")
+    fields = {}
+
+    _deleted = False
+    
+    def delete(self):
+        container = self.context.__parent__
+        name = self.context.__name__
+        if name in container:
+            try:
+                del container[name]
+                self._deleted = True
+                return self._deleted
+            except ValueError, e:
+                pass
+        self._deleted = False
+        return self._deleted
+
+    def nextURL(self):
+        if self._deleted == False:
+            return self.url(self.context)
+        self.redirect(self.url(self.context))
+
+    @form.button.buttonAndHandler(_('Confirm'), name='confirm')
+    def handleConfirm(self, action):
+        result = self.delete()
+        if result is False:
+            self.status = _("This object could not be deleted")
+        self.redirect(self.nextURL())
