@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.2.1 (2009-11-02)
+------------------
+
+* The Delete form is now using class level messages for success and
+  failure.
+* Updated tests to cover the deletion bug.
+* Corrected the redirection URL after a delete action.
+
+
 0.2 (2009-11-02)
 ----------------
 
