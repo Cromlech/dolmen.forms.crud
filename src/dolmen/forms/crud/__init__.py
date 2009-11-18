@@ -4,3 +4,6 @@ from events import ObjectInitializedEvent
 from addview import Adder
 from crudforms import Display, Add, Edit, Delete
 from customize import FieldsCustomizer
+
+from zope.i18nmessageid import MessageFactory
+i18n = MessageFactory("dolmen.forms.crud")

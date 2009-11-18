@@ -9,7 +9,7 @@ from zope.i18nmessageid import MessageFactory
 from zope.cachedescriptors.property import CachedProperty
 from dolmen.forms.crud import utils, interfaces as crud
 
-_ = MessageFactory("dolmen")
+_ = MessageFactory("dolmen.forms.crud")
 
 
 class Add(form.PageAddForm):
@@ -147,10 +147,14 @@ class Delete(form.PageForm):
     form_name = _(u"Are you really sure ?")
     fields = {}
 
-    successMessage = _("This object has been deleted")
+    _deleted = False
+
     failureMessage = _("This object could not be deleted")
 
-    _deleted = False
+    @property
+    def successMessage(self):
+        return _("${name} has been deleted",
+                 mapping={'name': self.context.title})
     
     @form.button.buttonAndHandler(_('Confirm'), name='confirm')
     def handleConfirm(self, action):
