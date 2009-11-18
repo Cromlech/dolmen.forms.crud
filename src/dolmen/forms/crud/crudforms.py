@@ -153,7 +153,7 @@ class Delete(form.PageForm):
 
     @property
     def successMessage(self):
-        return _("${name} has been deleted",
+        return _("`${name}` has been deleted",
                  mapping={'name': self.context.title})
     
     @form.button.buttonAndHandler(_('Confirm'), name='confirm')

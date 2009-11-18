@@ -320,8 +320,9 @@ When confirmed, the form tries to delete the object::
   >>> deleteform = getMultiAdapter((naib, post), name='deleteform')
   >>> deleteform.updateForm()
   
-  >>> deleteform.status
-  u'This object has been deleted'
+  >>> from zope.i18n import translate
+  >>> translate(deleteform.status, context=post)
+  u'`Stilgar` has been deleted'
 
   >>> list(sietch.keys())
   []

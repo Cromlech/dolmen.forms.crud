@@ -29,6 +29,7 @@ install_requires = [
     ]
 
 tests_require = install_requires + [
+    'zope.i18n',
     'zope.testing',
     'zope.securitypolicy',
     'zope.app.testing',
