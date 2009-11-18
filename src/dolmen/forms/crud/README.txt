@@ -432,7 +432,7 @@ object creation::
 
   >>> for event in logger: print event
   <dolmen.forms.crud.events.ObjectInitializedEvent object at ...> 
-  <zope.app.container.contained.ObjectAddedEvent object at ...>
+  <zope.lifecycleevent.ObjectAddedEvent object at ...>
     
 We can see that there is no `zope.lifecycleevent.ObjectCreatedEvent`
 fired. Instead, we have a `dolmen.forms.crud.ObjectInitializedEvent`.

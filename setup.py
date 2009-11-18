@@ -2,7 +2,7 @@ from os.path import join
 from setuptools import setup, find_packages
 
 name = 'dolmen.forms.crud'
-version = '0.3dev'
+version = '0.3'
 readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
@@ -21,12 +21,11 @@ install_requires = [
     'zope.traversing',
     'zope.lifecycleevent',
     'zope.cachedescriptors',
-    'zope.app.container',
     'dolmen.field >= 0.3',
     'dolmen.content >= 0.2.2',
     'dolmen.forms.base >= 0.1',
     'megrok.pagetemplate >= 0.3',
-    'megrok.z3cform.base >= 0.1',
+    'megrok.z3cform.base >= 0.2',
     ]
 
 tests_require = install_requires + [

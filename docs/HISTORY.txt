@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.3.0 (2009-11-02)
+------------------
+
+* Removed dependencies on zope.app.container.
+* Upgraded to use ZTK versions (1.0dev).
+
+
 0.2.1 (2009-11-02)
 ------------------
 
@@ -10,15 +17,15 @@ Changelog
 * Corrected the redirection URL after a delete action.
 
 
-0.2 (2009-11-02)
-----------------
+0.2.0 (2009-11-02)
+------------------
 
 * Added a DeleteForm
 * Added titles to all the forms
 * Corrected double nextURL method in the EditForm.
 
 
-0.1 (2009-10-26)
-----------------
+0.1.0 (2009-10-26)
+------------------
 
 * Initial release
