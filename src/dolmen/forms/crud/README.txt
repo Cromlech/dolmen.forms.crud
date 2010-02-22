@@ -33,8 +33,8 @@ Let's first create a container in which we'll test the adding view::
   >>> dolmen.content.IBaseContent.providedBy(sietch)
   True
   
-  >>> from zope.app.testing.functional import getRootFolder
-  >>> root = getRootFolder()
+  >>> from zope.site.hooks import getSite
+  >>> root = getSite()
   >>> root['sietch'] = sietch
 
 With the container created, the adding view should be available and operational.

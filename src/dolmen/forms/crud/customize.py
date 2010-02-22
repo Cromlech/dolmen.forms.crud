@@ -14,6 +14,6 @@ class FieldsCustomizer(grok.MultiAdapter):
         self.context = context
         self.form = form
         self.request = request
-    
+
     def __call__(self, fields):
         raise NotImplementedError("""Implement your own.""")

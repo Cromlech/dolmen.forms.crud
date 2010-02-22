@@ -2,38 +2,38 @@ from os.path import join
 from setuptools import setup, find_packages
 
 name = 'dolmen.forms.crud'
-version = '0.3'
+version = '0.4'
 readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
-    'setuptools',
-    'grokcore.security',
-    'grokcore.component',
-    'grokcore.viewlet',
-    'zope.event',
-    'zope.schema',
-    'zope.location',
-    'zope.security',
-    'zope.component',
-    'zope.interface',
-    'zope.publisher',
-    'zope.traversing',
-    'zope.lifecycleevent',
-    'zope.cachedescriptors',
-    'dolmen.field >= 0.3',
     'dolmen.content >= 0.2.2',
     'dolmen.forms.base >= 0.1',
+    'grokcore.component',
     'megrok.pagetemplate >= 0.3',
     'megrok.z3cform.base >= 0.2',
+    'setuptools',
+    'zope.cachedescriptors',
+    'zope.component >= 3.9.1',
+    'zope.container',
+    'zope.event',
+    'zope.i18nmessageid',
+    'zope.interface',
+    'zope.lifecycleevent',
+    'zope.location',
+    'zope.publisher',
+    'zope.schema',
+    'zope.security',
+    'zope.traversing',
     ]
 
-tests_require = install_requires + [
+tests_require = [
+    'megrok.layout',
     'zope.i18n',
-    'zope.testing',
+    'zope.principalregistry',
     'zope.securitypolicy',
-    'zope.app.testing',
-    'zope.app.zcmlfiles',
+    'zope.site',
+    'zope.testing',
     ]
 
 setup(name = name,

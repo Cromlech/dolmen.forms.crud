@@ -20,10 +20,9 @@ class IFactoryAdding(IAdding):
     See `dolmen.content.IFactory` definition for more information.
     """
     factory = Object(
-        missing_value = None,
-        title = u"The factory generating the content.",
-        schema = dolmen.content.IFactory
-        )
+        missing_value=None,
+        title=u"The factory generating the content.",
+        schema=dolmen.content.IFactory)
 
 
 class IObjectInitializedEvent(IObjectCreatedEvent):

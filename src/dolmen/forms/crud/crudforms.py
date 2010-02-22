@@ -32,12 +32,11 @@ class Add(form.PageAddForm):
     def fields(self):
         ifaces = self.context.factory.getSchema()
         fields = form.Fields(*ifaces).omit('__parent__')
-        
+
         modifier = utils.queryClassMultiAdapter(
             (self.context.factory.factory, self, self.request),
             self.context,
-            crud.IFieldsCustomization
-            )
+            crud.IFieldsCustomization)
 
         if modifier is not None:
             return modifier(fields)
@@ -75,7 +74,7 @@ class Edit(form.PageEditForm):
     grok.title(_(u"Edit"))
     grok.context(content.IBaseContent)
     form.extends(form.PageEditForm, ignoreButtons=True)
-    
+
     form_name = _(u"Edit")
 
     @property
@@ -92,8 +91,8 @@ class Edit(form.PageEditForm):
         fields = form.Fields(*iface).omit('__parent__')
         modifier = queryMultiAdapter(
             (self.context, self, self.request),
-            crud.IFieldsCustomization
-            )
+            crud.IFieldsCustomization)
+
         if modifier is not None:
             return modifier(fields)
         return fields
@@ -129,8 +128,8 @@ class Display(form.PageDisplayForm):
         fields = form.Fields(*iface).omit('__parent__', 'title')
         modifier = queryMultiAdapter(
             (self.context, self, self.request),
-            crud.IFieldsCustomization
-            )
+            crud.IFieldsCustomization)
+
         if modifier is not None:
             return modifier(fields)
         return fields
@@ -155,19 +154,19 @@ class Delete(form.PageForm):
     def successMessage(self):
         return _("`${name}` has been deleted",
                  mapping={'name': self.context.title})
-    
+
     @form.button.buttonAndHandler(_('Confirm'), name='confirm')
     def handleConfirm(self, action):
         container = self.context.__parent__
         name = self.context.__name__
-        
+
         if name in container:
             try:
                 del container[name]
                 self._deleted = True
             except ValueError, e:
                 pass
-        
+
         if self._deleted is True:
             self.status = self.successMessage
             self.redirect(self.url(container))

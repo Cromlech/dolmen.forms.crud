@@ -3,14 +3,18 @@
    xmlns:grok="http://namespaces.zope.org/grok">
 
   <!-- meta files -->
-  <include package="zope.app.zcmlfiles" file="meta.zcml" />
+  <include package="zope.component" file="meta.zcml" />
+  <include package="zope.i18n" file="meta.zcml" />
+  <include package="zope.security" file="meta.zcml" />
   <include package="zope.securitypolicy" file="meta.zcml" />
+  <include package="zope.principalregistry" file="meta.zcml" />
 
-  <!-- Packages with needed components -->
-  <include package="zope.app.zcmlfiles" />
-
-  <!-- Grokking the tests -->
+  <!-- Dependencies -->
+  <include package="zope.security" />
+  <include package="zope.container" />
   <include package="dolmen.forms.crud" />
+  
+  <!-- Grokking tests -->
   <grok:grok package="dolmen.forms.crud.tests" />
 
   <!-- Layer manipulation -->

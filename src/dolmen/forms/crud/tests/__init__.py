@@ -5,16 +5,16 @@ import megrok.layout
 import dolmen.content
 import grokcore.component as grok
 from zope.interface import Interface
-from zope.app.container.constraints import contains
+from zope.container.constraints import contains
 
 
 class IDesertWarrior(dolmen.content.IBaseContent):
     """Defines a warrior living in the desert.
     """
     water = zope.schema.Int(
-        title = u"Number water gallons owned",
-        default = 1,
-        required = True
+        title=u"Number water gallons owned",
+        default=1,
+        required=True,
         )
 
 
@@ -30,7 +30,7 @@ class Sietch(dolmen.content.Container):
     dolmen.content.name('sietch')
     dolmen.content.schema(IDesertCave)
     dolmen.content.nofactory()
-    
+
 
 class TrainingCamp(dolmen.content.Factory):
     """A camp that produces Fremen warriors.
