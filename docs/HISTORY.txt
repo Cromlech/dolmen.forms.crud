@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.4.0 (2010-02-22)
+------------------
+
+* Cleaned dependencies and tests. The package is now 100% zope.app
+  free.
+
+
 0.3.0 (2009-11-02)
 ------------------
 
