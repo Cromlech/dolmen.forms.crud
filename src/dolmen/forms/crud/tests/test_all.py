@@ -19,6 +19,7 @@ class DolmenFormsCrudLayer(ZCMLFileLayer):
     """
 
     def setUp(self):
+        ZCMLFileLayer.setUp(self)
         eventtesting.setUp()
         traversingSetUp()
         zope.component.hooks.setHooks()
@@ -31,9 +32,6 @@ class DolmenFormsCrudLayer(ZCMLFileLayer):
         site = rootFolder()
         site.setSiteManager(LocalSiteManager(site))
         zope.component.hooks.setSite(site)
-
-        ZCMLFileLayer.setUp(self)
-        return site
 
     def tearDown(self):
         ZCMLFileLayer.tearDown(self)

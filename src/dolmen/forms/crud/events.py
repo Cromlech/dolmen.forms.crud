@@ -1,25 +1,32 @@
 # -*- coding: utf-8 -*-
 
 import grokcore.component as grok
-from dolmen.content import IBaseContent
-from dolmen.forms.base import IFieldUpdate
-from dolmen.forms.crud import IObjectInitializedEvent
+from dolmen.content import schema, IBaseContent
+from dolmen.forms.base import Fields, IFieldUpdate
 from zope.component import getAdapters
-from zope.lifecycleevent import ObjectModifiedEvent, ObjectCreatedEvent
+from zope.lifecycleevent import IObjectModifiedEvent, IObjectCreatedEvent
 
 
-class ObjectInitializedEvent(ObjectCreatedEvent):
-    """An object has been created and initialized with form values.
+@grok.subscribe(IBaseContent, IObjectCreatedEvent)
+def notify_fields_creation(ob, event):
+    """This handler propagates the ObjectCreatedEvent to a more atomic
+    level, by calling an adapter on each field of the schema. This permits
+    to actually interact at the field level, after it gets a value for the
+    first time.
     """
-    grok.implements(IObjectInitializedEvent)
+    schemas = schema.bind().get(ob)
+    fields = Fields(*schemas)
+    
+    for field_repr in fields:
+        field = field_repr._field
+        if field.get(ob) != field.missing_value:
+            handlers = getAdapters((ob, field), IFieldUpdate)
+            for handler in handlers:
+                # Iteration through the generator
+                pass
 
-    def __init__(self, object, *descriptions):
-        super(ObjectInitializedEvent, self).__init__(object)
-        self.descriptions = descriptions
 
-
-@grok.subscribe(IBaseContent, ObjectModifiedEvent)
-@grok.subscribe(IBaseContent, ObjectInitializedEvent)
+@grok.subscribe(IBaseContent, IObjectModifiedEvent)
 def notify_fields_update(ob, event):
     """This handler propagates the ObjectModifiedEvent to a more atomic
     level, by calling an adapter on each modified field. This permits to

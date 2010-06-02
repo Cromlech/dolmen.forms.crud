@@ -7,7 +7,7 @@ readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
-    'dolmen.content >= 0.2.2',
+    'dolmen.content >= 0.3.1',
     'dolmen.forms.base >= 1.0a1',
     'grokcore.component',
     'megrok.pagetemplate >= 0.3',

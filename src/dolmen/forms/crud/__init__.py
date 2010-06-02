@@ -5,8 +5,7 @@ from zope.i18nmessageid import MessageFactory
 i18n = MessageFactory("dolmen.forms.crud")
 
 from dolmen.forms.crud.interfaces import (
-    IAdding, IFactoryAdding, IFieldsCustomization, IObjectInitializedEvent)
-from dolmen.forms.crud.events import ObjectInitializedEvent
+    IAdding, IFactoryAdding, IFieldsCustomization)
 from dolmen.forms.crud.addview import Adder
 from dolmen.forms.crud.crudforms import (
     ApplicationForm, Display, Add, Edit, Delete)

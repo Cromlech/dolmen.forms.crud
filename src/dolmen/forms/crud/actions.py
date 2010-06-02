@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from dolmen.forms.base.utils import apply_data_event
-from dolmen.forms.crud.utils import notify_object_creation
 from zeam.form import base
 from zeam.form.base.markers import SUCCESS, FAILURE, NO_VALUE
+from zope.event import notify
 from zope.i18nmessageid import MessageFactory
+from zope.lifecycleevent import ObjectCreatedEvent
+
 _ = MessageFactory("dolmen.forms.crud")
 
 
@@ -22,8 +24,8 @@ class Add(base.Action):
         if errors:
             return FAILURE
 
-        obj = self.factory()
-        notify_object_creation(form.fields, obj, data)
+        obj = self.factory(**data)
+        notify(ObjectCreatedEvent(obj))
         form.context.add(obj)
 
         form.flash(_(u"Content created"))

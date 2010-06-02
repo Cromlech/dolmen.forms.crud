@@ -5,6 +5,8 @@
 
   <!-- Dependencies -->
   <include package="zeam.form.ztk" />
+  <include package="zeam.form.layout" />
+  <include package="megrok.layout" />
   <include package="dolmen.content" />
 
   <!-- Translations -->

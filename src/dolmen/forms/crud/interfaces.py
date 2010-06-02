@@ -25,11 +25,6 @@ class IFactoryAdding(IAdding):
         schema=dolmen.content.IFactory)
 
 
-class IObjectInitializedEvent(IObjectCreatedEvent):
-    """An object has been created and all the fields received their values.
-    """
-
-
 class IFieldsCustomization(Interface):
     """Defines a form customization. A form customization is an adapter
     that allows to modify the fields of a form and their rendering.

@@ -3,7 +3,7 @@ dolmen.forms.crud
 =================
 
 `dolmen.forms.crud` is a module which helps developers create their
-C.R.U.D forms using `Grok`, `megrok.z3cform` and `dolmen.content`. It
+C.R.U.D forms using `Grok`, `zeam.form` and `dolmen.content`. It
 provides a collection of base classes to add, edit, and access
 content. It provides adapters to customize the fields of a form.
 
@@ -66,6 +66,7 @@ called. Let's try to access it with Manfred::
   Traceback (most recent call last):
   ...
   Unauthorized: <class 'dolmen.forms.crud.tests.Fremen'> requires the 'zope.ManageContent' permission.
+
   >>> security.endInteraction()
 
 Manfred is not authorized, however Manager should successfully be able
@@ -134,28 +135,9 @@ violated, we get an error::
   ...
   InvalidItemType: (<...Sietch object at ...>, <...Harkonnen object at ...>, (<InterfaceClass dolmen.forms.crud.tests.IDesertWarrior>,))
 
-
 The `add` method of the adding view can be called from the AddForm to delegate
 the adding operation. The generic adding view already handles the common
-operations such as naming and persistence. Still, our add form is responsible
-for the factoring of the item. Let's test the important attributes
-and methods::
-
-  >>> addform.fields.keys()
-  ['title', 'water']
-
-  >>> chani = addform.create({'title': u'Chani', 'water': 5})
-  >>> chani
-  <dolmen.forms.crud.tests.Fremen object at ...>
-
-  >>> chani.title
-  u'Chani'
-  >>> chani.water
-  5
-
-The adding view works as intended. The real interest in using such an
-abstraction is the ease with which you can switch adding behaviors, just by
-registering a new component.
+operations such as naming and persistence.
 
 
 Generic forms
@@ -164,7 +146,23 @@ Generic forms
 `dolmen.forms.crud` provides a set of ready-to-use base classes that
 will auto-generate forms based on `dolmen.content` schemas.
 
-The context of the tests is out previously created content::
+`dolmen.forms.crud` forms are layout aware (see `megrok.layout` for
+more info). Therefore, we need to register a basic layout in order to
+render our forms::
+
+  >>> from megrok.layout import Layout
+  >>> from zope.interface import Interface
+
+  >>> class GenericLayout(Layout):
+  ...     grokcore.component.context(Interface)
+  ...
+  ...     def render(self):
+  ...         return self.view.content()
+
+  >>> grokcore.component.testing.grok_component('layout', GenericLayout)
+  True
+
+The context of the tests is our previously created content::
 
   >>> naib
   <dolmen.forms.crud.tests.Fremen object at ...>
@@ -191,8 +189,9 @@ presence of the fields and the label on the form itself::
   
   >>> addform.updateForm()
   >>> for action in addform.actions: print action
-  save
+  <Add Add>
 
+  >>> security.endInteraction()
 
 Update
 ------
@@ -206,22 +205,29 @@ An edit form can be registered simply by sublassing the Edit base class::
   >>> grokcore.component.testing.grok_component('editform', EditForm)
   True
 
+By default, the registered name of an Edit form is 'edit'::
+
+  >>> grokcore.component.name.bind().get(EditForm)
+  'edit'
+
 This form registered, we can check if all the fields are ready to be
 edited::
 
   >>> post = TestRequest(form={
-  ...     'form.widgets.water': '25',
-  ...     'form.widgets.title': u'Stilgar',
-  ...     'form.buttons.apply': u'Apply'}
+  ...     'form.field.water': '25',
+  ...     'form.field.title': u'Stilgar',
+  ...     'form.action.update': u'Update'}
   ...     )
 
-  >>> editform = getMultiAdapter((naib, post), name='editform')
+  >>> security.newInteraction(post)
+
+  >>> editform = getMultiAdapter((naib, post), name='edit')
   >>> editform
   <dolmen.forms.crud.tests.EditForm object at ...>
 
   >>> editform.updateForm()
   >>> for action in editform.actions: print action
-  apply
+  <Update Update>
 
   >>> editform.fields.keys()
   ['title', 'water']
@@ -233,6 +239,7 @@ The values should now be set::
   >>> naib.water
   25
 
+  >>> security.endInteraction()
 
 Read
 -----
@@ -246,6 +253,8 @@ A special kind of form allows you display your content::
   >>> grokcore.component.testing.grok_component('display', DefaultView)
   True
 
+  >>> security.newInteraction(TestRequest())
+
   >>> view = getMultiAdapter((naib, request), name='defaultview')
   >>> view
   <dolmen.forms.crud.tests.DefaultView object at ...>
@@ -258,31 +267,27 @@ particular attribute is used directly by the template::
 
 A display form has no actions::
 
-  >>> view.updateForm()
-  >>> for action in view.actions: print action
-  Traceback (most recent call last):
-  ...
-  AttributeError: 'DefaultView' object has no attribute 'actions'
+  >>> len(view.actions)
+  0
 
 `dolmen.forms.crud` provides a very basic template for that form. As
 we can see, the title attribute is used as the HTML header (h1) of the
 page::
 
   >>> print view()
-  <div class="defaultview">
+  <form action="http://127.0.0.1" method="post" enctype="multipart/form-data">
     <h1>Stilgar</h1>
-    <div class="field">
-      <label for="form-widgets-water">
-        <span>Number water gallons owned</span>
-      </label>
-      <p class="discreet"></p>
-      <div class="widget">
-        <span id="form-widgets-water"
-              class="text-widget required int-field">25</span>
+    <div class="fields">
+      <div class="field">
+        <label class="field-label" for="form-field-water">Number water gallons owned</label>
+        <span class="field-required">(required)</span>
+        <br />
+        25
       </div>
     </div>
-  </div>
+  </form>
 
+  >>> security.endInteraction()
 
 Delete
 ------
@@ -303,16 +308,18 @@ A delete form is a simple form with no fields, that only provides a
 
   >>> deleteform.updateForm()
   >>> for action in deleteform.actions: print action
-  confirm
+  <Delete Delete>
 
-  >>> deleteform.fields
-  {}
+  >>> len(deleteform.fields)
+  0
 
 When confirmed, the form tries to delete the object::
 
   >>> post = TestRequest(form={
-  ...     'form.buttons.confirm': u'Confirm'}
+  ...     'form.action.delete': u'Delete'}
   ...     )
+
+  >>> security.newInteraction(post)
 
   >>> list(sietch.keys())
   [u'Fremen']
@@ -322,7 +329,7 @@ When confirmed, the form tries to delete the object::
   
   >>> from zope.i18n import translate
   >>> translate(deleteform.status, context=post)
-  u'`Stilgar` has been deleted'
+  u'The object has been deleted.'
 
   >>> list(sietch.keys())
   []
@@ -332,6 +339,7 @@ When confirmed, the form tries to delete the object::
   >>> deleteform.response.getHeader('location')
   'http://127.0.0.1/sietch'
 
+  >>> security.endInteraction()
 
 Form customization
 ==================
@@ -364,9 +372,11 @@ We can now register and test the customization::
   >>> grokcore.component.testing.grok_component('custom', RemoveWater)
   True
 
+  >>> security.newInteraction(Participation(manager))
+
   >>> addform = addingview.traverse('fremen', [])
   >>> for field in addform.fields: print field
-  title
+  <TextLineSchemaField Title>
 
 One important thing is noticeable here : the 'RemoveWater' adapter was
 registered for the 'Fremen' component. To be able to lookup the
@@ -396,6 +406,7 @@ Fremen schema::
   >>> view.fields.keys()
   ['title', 'water']
 
+  >>> security.endInteraction()
 
 Events and field updates
 ========================
@@ -407,48 +418,14 @@ To check on all the events triggered, we can set up a simple event
 logging list and a generic handler::
 
   >>> from zope.component import provideHandler
-  >>> from zope.component.interfaces import IObjectEvent
+  >>> from zope.lifecycleevent import IObjectModifiedEvent
   >>> logger = []
   
   >>> def event_logger(object, event):
   ...   logger.append(event)
 
-  >>> provideHandler(event_logger, (Fremen, IObjectEvent))
+  >>> provideHandler(event_logger, (Fremen, IObjectModifiedEvent))
 
-
-Adding events
--------------
-
-In order to notify the lifecycle handlers, two main events
-are fired while an object is created using an add form::
-
-  >>> arrakin = root['arrakin'] = dolmen.content.Container()
-  >>> addingview = getMultiAdapter((arrakin, request), name='add')
-  >>> addform = addingview.traverse('fremen', [])
-
-  >>> chani = addform.createAndAdd({'title': u'Chani'})
-
-We iterate through the logger to check the events triggered during the
-object creation::
-
-  >>> for event in logger: print event
-  <dolmen.forms.crud.events.ObjectInitializedEvent object at ...> 
-  <zope.lifecycleevent.ObjectAddedEvent object at ...>
-    
-We can see that there is no `zope.lifecycleevent.ObjectCreatedEvent`
-fired. Instead, we have a `dolmen.forms.crud.ObjectInitializedEvent`.
-Let's have a closer look at this homegrown event::
-
-  >>> from zope.lifecycleevent import IObjectCreatedEvent
-  >>> init_event = logger[0]
-
-  >>> IObjectCreatedEvent.providedBy(init_event)
-  True
-
-  >>> for desc in init_event.descriptions:
-  ...   print "%r: %s" % (desc.interface, desc.attributes)
-  <InterfaceClass dolmen.content.interfaces.IBaseContent>: ('title',)
-  
 
 Editing events
 --------------
@@ -460,12 +437,17 @@ Let's have the same introspection check with the edit form::
 We provide data for the update::
 
   >>> request = TestRequest(form={
-  ...     'form.widgets.water': '10',
-  ...     'form.widgets.title': u'Sihaya',
-  ...     'form.buttons.apply': u'Apply'}
+  ...     'form.field.water': '10',
+  ...     'form.field.title': u'Sihaya',
+  ...     'form.action.update': u'Update'}
   ...     )
 
-  >>> editform = getMultiAdapter((chani, request), name='editform')
+  >>> security.newInteraction(request)
+
+  >>> chani = Fremen()
+  >>> root['chani'] = chani
+
+  >>> editform = getMultiAdapter((chani, request), name='edit')
   >>> editform.updateForm()
 
 We check the trigged events::
@@ -478,14 +460,15 @@ event's descriptions::
 
   >>> for desc in logger[0].descriptions:
   ...   print "%r: %s" % (desc.interface, desc.attributes)
-  <InterfaceClass dolmen.forms.crud.tests.IDesertWarrior>: ('water',)
   <InterfaceClass dolmen.content.interfaces.IBaseContent>: ('title',)
+  <InterfaceClass dolmen.forms.crud.tests.IDesertWarrior>: ('water',)
 
   >>> chani.title
   u'Sihaya'
   >>> chani.water
   10
 
+  >>> security.endInteraction()
 
 Field update
 ------------
@@ -494,7 +477,7 @@ Field update
 can be used to atomize the updating process of an object:
 `IFieldUpdate`. An implementation is available in `dolmen.forms.crud`,
 using an event handler, listening on ObjectModifiedEvent and
-ObjectInitializedEvent::
+ObjectCreatedEvent::
 
   >>> updates = []
 
@@ -505,21 +488,38 @@ ObjectInitializedEvent::
 
   >>> @implementer(IFieldUpdate)
   ... @adapter(Fremen, TextLine)
-  ... def updated_textfield(field, context):
-  ...    updates.append((field, context))
+  ... def updated_textfield(context, field):
+  ...    updates.append((context, field))
 
   >>> provideAdapter(updated_textfield, name="updatetext")
 
 
 Using an add form, the IFieldUpdate adapters should be called during an objects creation::
 
+  >>> request = TestRequest(form={
+  ...     'form.field.title': u'Liet',
+  ...     'form.action.add': u'Add',
+  ...     })
+
+  >>> request.setPrincipal(manager)
+  >>> interaction = security.newInteraction(request)
+
   >>> desert = root['desert'] = dolmen.content.Container()
   >>> addingview = getMultiAdapter((desert, request), name='add')
   >>> addform = addingview.traverse('fremen', [])
+  >>> addform.updateForm()
 
-  >>> kynes = addform.createAndAdd({'title': u'liet'})
+  >>> kynes = desert['Fremen']
+  >>> kynes
+  <dolmen.forms.crud.tests.Fremen object at ...>
+  >>> kynes.title
+  u'Liet'  
+
   >>> print updates
-  [(<dolmen.forms.crud.tests.Fremen object at ...>, <zope.schema._bootstrapfields.TextLine object at ...>)]
+  [(<dolmen.forms.crud.tests.Fremen object at ...>,
+  <zope.schema._bootstrapfields.TextLine object at ...>)]
+
+  >>> security.endInteraction()
 
 
 We can do the same thing for the edit form::
@@ -527,12 +527,15 @@ We can do the same thing for the edit form::
   >>> updates = []
 
   >>> request = TestRequest(form={
-  ...     'form.widgets.water': '50',
-  ...     'form.widgets.title': u'Imperial weather specialist',
-  ...     'form.buttons.apply': u'Apply'}
+  ...     'form.field.water': '50',
+  ...     'form.field.title': u'Imperial weather specialist',
+  ...     'form.action.update': u'Update'}
   ...     )
 
-  >>> editform = getMultiAdapter((kynes, request), name='editform')
+  >>> request.setPrincipal(manager)
+  >>> security.newInteraction(request)
+
+  >>> editform = getMultiAdapter((kynes, request), name='edit')
   >>> editform.updateForm()
 
   >> kynes.title
@@ -547,11 +550,11 @@ anything::
  >>> updates = []
 
   >>> request = TestRequest(form={
-  ...     'form.widgets.water': '40',
-  ...     'form.buttons.apply': u'Apply'}
+  ...     'form.field.water': '40',
+  ...     'form.action.update': u'Update'}
   ...     )
 
-  >>> editform = getMultiAdapter((kynes, request), name='editform')
+  >>> editform = getMultiAdapter((kynes, request), name='edit')
   >>> editform.updateForm()
 
   >>> updates

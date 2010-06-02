@@ -13,12 +13,11 @@
   <include package="zope.security" />
   <include package="zope.container" />
   <include package="dolmen.forms.crud" />
-  
+  <include package="grokcore.message" file="ftesting.zcml" />
+
   <!-- Grokking tests -->
   <grok:grok package="dolmen.forms.crud.tests" />
 
-  <!-- Layer manipulation -->
-  <include package="megrok.z3cform.base" file="default_form_layer.zcml"/>
 
   <!-- Security -->
   <securityPolicy
