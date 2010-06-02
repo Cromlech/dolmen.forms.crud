@@ -1,6 +1,17 @@
 Changelog
 =========
 
+1.0a1 (2010-06-03)
+------------------
+
+* The package is now using `zeam.form` instead of `z3c.form`.
+* Added internationalization (French, English)
+* The IObjectInitializedEvent has been removed, as we are now using
+  dolmen.content >= 0.3.1. It has been replaced by a simple
+  IObjectAddedEvent. The IFieldUpdate triggers have been modified
+  accordingly.
+
+
 0.4.0 (2010-02-22)
 ------------------
 
