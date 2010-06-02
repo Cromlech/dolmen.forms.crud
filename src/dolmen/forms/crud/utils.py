@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from dolmen.forms.base import set_fields_data
+from dolmen.forms.crud import ObjectInitializedEvent
+
 from zope.event import notify
 from zope.lifecycleevent import Attributes
 from zope.component import getGlobalSiteManager
 from zope.interface import implementedBy, providedBy
-from dolmen.forms.crud import ObjectInitializedEvent
-from megrok.z3cform.base.utils import set_fields_data
 
 
+# This class will go away, with the use of dolmen.content >= 0.3
 def notify_object_creation(fields, content, data):
     """Builds a list of descriptions, made of Attributes objects, defining
     the changes made on the content and the related interface.
