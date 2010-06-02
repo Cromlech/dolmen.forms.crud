@@ -1,18 +1,24 @@
 # -*- coding: utf-8 -*-
 
+import zope.i18n
 import dolmen.content as content
-import dolmen.forms.base as form
+import zeam.form.ztk as form
 import grokcore.component as grok
 
+from dolmen.forms.base import ApplicationForm
+from dolmen.forms.crud import actions as formactions
+from dolmen.forms.crud.interfaces import IFactoryAdding, IFieldsCustomization
+from dolmen.forms.crud.utils import queryClassMultiAdapter
+
+from zeam.form.base import Fields, Actions
+from zope.cachedescriptors.property import CachedProperty
 from zope.component import queryMultiAdapter
 from zope.i18nmessageid import MessageFactory
-from zope.cachedescriptors.property import CachedProperty
-from dolmen.forms.crud import utils, interfaces as crud
 
 _ = MessageFactory("dolmen.forms.crud")
 
 
-class Add(form.PageAddForm):
+class Add(ApplicationForm):
     """The add form itself is not protected. The security is checked on
     'update'. It checks if the 'require' directive of the factored item
     is respected on the context.
@@ -20,103 +26,68 @@ class Add(form.PageAddForm):
     grok.baseclass()
     grok.title(_(u"Add"))
     grok.name('dolmen.add')
-    grok.context(crud.IFactoryAdding)
-
-    form_name = _(u"Add")
+    grok.context(IFactoryAdding)
 
     @property
     def label(self):
-        return self.context.factory.title
+        return zope.i18n.translate(self.context.factory.title,
+                                   context=self.request)
 
     @CachedProperty
     def fields(self):
         ifaces = self.context.factory.getSchema()
-        fields = form.Fields(*ifaces).omit('__parent__')
+        fields = Fields(*ifaces).omit('__parent__')
 
-        modifier = utils.queryClassMultiAdapter(
+        modifier = queryClassMultiAdapter(
             (self.context.factory.factory, self, self.request),
-            self.context,
-            crud.IFieldsCustomization)
+            self.context, IFieldsCustomization)
 
         if modifier is not None:
             return modifier(fields)
         return fields
 
-    def nextURL(self):
-        return self.context.nextURL()
-
-    def createAndAdd(self, data):
-        obj = self.create(data)
-        self.add(obj)
-        return obj
-
-    def add(self, object):
-        return self.context.add(object)
-
-    def create(self, data):
-        obj = self.context.factory()
-        utils.notify_object_creation(self.fields, obj, data)
-        return obj
-
-    @form.button.buttonAndHandler(_('Save'), name='save')
-    def handleSave(self, action):
-        data, errors = self.extractData()
-        if errors:
-            self.status = self.formErrorsMessage
-            return
-        obj = self.createAndAdd(data)
-        if obj is not None:
-            self.redirect(self.url(obj))
+    @CachedProperty
+    def actions(self):
+        add = formactions.Add(_("Add"), self.context.factory)
+        return Actions(add)
 
 
-class Edit(form.PageEditForm):
+class Edit(ApplicationForm):
     grok.baseclass()
+    grok.name('edit')
     grok.title(_(u"Edit"))
     grok.context(content.IBaseContent)
-    form.extends(form.PageEditForm, ignoreButtons=True)
 
-    form_name = _(u"Edit")
+    ignoreContent = False
+    ignoreRequest = False
+    actions = Actions(formactions.Update(_("Update")))
 
     @property
     def label(self):
-        return _(u"edit_action", default=u"Edit: $name",
+        label = _(u"edit_action", default=u"Edit: $name",
                  mapping={"name": self.context.title})
-
-    def nextURL(self):
-        return self.url(self.context)
+        return zope.i18n.translate(label, context=self.request)
 
     @CachedProperty
     def fields(self):
         iface = content.schema.bind().get(self.context)
-        fields = form.Fields(*iface).omit('__parent__')
+        fields = Fields(*iface).omit('__parent__')
         modifier = queryMultiAdapter(
-            (self.context, self, self.request),
-            crud.IFieldsCustomization)
+            (self.context, self, self.request), IFieldsCustomization)
 
         if modifier is not None:
             return modifier(fields)
         return fields
 
-    @form.button.buttonAndHandler(_('Apply'), name='apply')
-    def handleApply(self, action):
-        data, errors = self.extractData()
-        if errors:
-            self.status = self.formErrorsMessage
-            return
-        changes = form.apply_data_event(self.fields, self.context, data)
-        if changes:
-            self.status = self.successMessage
-        else:
-            self.status = self.noChangesMessage
-        self.redirect(self.nextURL())
 
-
-class Display(form.PageDisplayForm):
+class Display(ApplicationForm):
     grok.baseclass()
     grok.title(_(u"View"))
     grok.context(content.IBaseContent)
 
-    ignoreContext = False
+    mode = "display"
+    ignoreRequest = True
+    ignoreContent = False
 
     @property
     def label(self):
@@ -127,49 +98,20 @@ class Display(form.PageDisplayForm):
         iface = content.schema.bind().get(self.context)
         fields = form.Fields(*iface).omit('__parent__', 'title')
         modifier = queryMultiAdapter(
-            (self.context, self, self.request),
-            crud.IFieldsCustomization)
+            (self.context, self, self.request), IFieldsCustomization)
 
         if modifier is not None:
             return modifier(fields)
         return fields
 
 
-class Delete(form.PageForm):
+class Delete(ApplicationForm):
     """A confirmation for to delete an object.
     """
     grok.baseclass()
     grok.title(_(u"Delete"))
     grok.context(content.IBaseContent)
 
-    label = _(u"Confirm deletion")
-    form_name = _(u"Are you really sure ?")
-    fields = {}
-
-    _deleted = False
-
-    failureMessage = _("This object could not be deleted")
-
-    @property
-    def successMessage(self):
-        return _("`${name}` has been deleted",
-                 mapping={'name': self.context.title})
-
-    @form.button.buttonAndHandler(_('Confirm'), name='confirm')
-    def handleConfirm(self, action):
-        container = self.context.__parent__
-        name = self.context.__name__
-
-        if name in container:
-            try:
-                del container[name]
-                self._deleted = True
-            except ValueError, e:
-                pass
-
-        if self._deleted is True:
-            self.status = self.successMessage
-            self.redirect(self.url(container))
-        else:
-            self.status = self.failureMessage
-            self.redirect(self.url(self.context))
+    label = _(u"Delete")
+    description = _(u"Are you really sure ?")
+    actions = Actions(formactions.Delete(_("Delete")))

@@ -2,16 +2,18 @@ from os.path import join
 from setuptools import setup, find_packages
 
 name = 'dolmen.forms.crud'
-version = '0.4'
+version = '1.0a1'
 readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
     'dolmen.content >= 0.2.2',
-    'dolmen.forms.base >= 0.1',
+    'dolmen.forms.base >= 1.0a1',
     'grokcore.component',
     'megrok.pagetemplate >= 0.3',
-    'megrok.z3cform.base >= 0.2',
+    'zeam.form.ztk',
+    'zeam.form.base',
+    'zeam.form.layout',
     'setuptools',
     'zope.cachedescriptors',
     'zope.component >= 3.9.1',
