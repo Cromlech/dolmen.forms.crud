@@ -35,7 +35,7 @@ class Add(base.Action):
 
 
 class Update(base.Action):
-    """Update action for any context.
+    """Update action for any locatable object.
     """
 
     def __call__(self, form):
@@ -52,7 +52,8 @@ class Update(base.Action):
 
 
 class Delete(base.Action):
-
+    """Delete action for any locatable context.
+    """
     successMessage = _(u"The object has been deleted.")
     failureMessage = _(u"This object could not be deleted.")
     
