@@ -8,7 +8,7 @@ history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
     'dolmen.content >= 0.2.2',
-    'dolmen.forms.base >= 0.1',
+    'dolmen.forms.base >= 1.0a1',
     'grokcore.component',
     'megrok.pagetemplate >= 0.3',
     'megrok.z3cform.base >= 0.2',
