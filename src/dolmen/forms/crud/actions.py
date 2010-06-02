@@ -3,7 +3,7 @@
 
 from dolmen.forms.base.utils import apply_data_event
 from zeam.form import base
-from zeam.form.base.markers import SUCCESS, FAILURE, NO_VALUE
+from zeam.form.base.markers import SUCCESS, FAILURE
 from zope.event import notify
 from zope.i18nmessageid import MessageFactory
 from zope.lifecycleevent import ObjectCreatedEvent
@@ -57,7 +57,6 @@ class Delete(base.Action):
     failureMessage = _(u"This object could not be deleted.")
     
     def __call__(self, form):
-        deleted = False
         container = form.context.__parent__
         name = form.context.__name__
 
@@ -68,7 +67,7 @@ class Delete(base.Action):
                 form.flash(form.status)
                 form.redirect(form.url(container))
                 return SUCCESS
-            except ValueError, e:
+            except ValueError:
                 pass
 
         form.status = self.failureMessage

@@ -37,8 +37,8 @@ Let's first create a container in which we'll test the adding view::
   >>> root = getSite()
   >>> root['sietch'] = sietch
 
-With the container created, the adding view should be available and operational.
-Let's have a quick overview::
+With the container created, the adding view should be available and
+operational. Let's have a quick overview::
     
   >>> from zope.component import getMultiAdapter
   >>> from zope.publisher.browser import TestRequest
@@ -111,12 +111,15 @@ itself, let's have a try at the `add` method::
   >>> added_item
   <dolmen.forms.crud.tests.Fremen object at ...>
 
+The created content is correctly located and persisted::
+
   >>> added_item.__name__
   u'Fremen'
   >>> added_item.__parent__ is sietch
   True
 
-An IAdding component should always be locatable::
+As a matter of fact, a IAdding component should always be
+locatable. Conveniently, you can access the location information::
 
   >>> addingview.__parent__
   <dolmen.forms.crud.tests.Sietch object at ...>

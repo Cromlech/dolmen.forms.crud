@@ -4,7 +4,6 @@ import dolmen.content
 from zope.schema import Object
 from zope.location.interfaces import ILocation
 from zope.interface import Interface, Attribute
-from zope.lifecycleevent.interfaces import IObjectCreatedEvent
 
 
 class IAdding(ILocation):
