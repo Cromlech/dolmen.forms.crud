@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from zeam.form.ztk.actions import CancelAction
 from dolmen.forms.base.utils import apply_data_event
 from zeam.form import base
 from zeam.form.base.markers import SUCCESS, FAILURE
@@ -11,7 +12,7 @@ from zope.lifecycleevent import ObjectCreatedEvent
 _ = MessageFactory("dolmen.forms.crud")
 
 
-class Add(base.Action):
+class AddAction(base.Action):
     """Add action for an IAdding context.
     """
 
@@ -35,7 +36,7 @@ class Add(base.Action):
         return SUCCESS
 
 
-class Update(base.Action):
+class UpdateAction(base.Action):
     """Update action for any locatable object.
     """
 
@@ -53,7 +54,7 @@ class Update(base.Action):
         return SUCCESS
 
 
-class Delete(base.Action):
+class DeleteAction(base.Action):
     """Delete action for any locatable context.
     """
     successMessage = _(u"The object has been deleted.")

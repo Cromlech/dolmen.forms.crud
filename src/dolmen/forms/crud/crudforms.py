@@ -50,8 +50,8 @@ class Add(ApplicationForm):
 
     @CachedProperty
     def actions(self):
-        add = formactions.Add(_("Add"), self.context.factory)
-        return Actions(add)
+        add = formactions.AddAction(_("Add"), self.context.factory)
+        return Actions(add, formactions.CancelAction(_("Cancel")))
 
 
 class Edit(ApplicationForm):
@@ -62,7 +62,8 @@ class Edit(ApplicationForm):
 
     ignoreContent = False
     ignoreRequest = False
-    actions = Actions(formactions.Update(_("Update")))
+    actions = Actions(formactions.UpdateAction(_("Update")),
+                      formactions.CancelAction(_("Cancel")))
 
     submissionError = None
 
@@ -119,4 +120,5 @@ class Delete(ApplicationForm):
     label = _(u"Delete")
     description = _(u"Are you really sure ?")
     submissionError = None
-    actions = Actions(formactions.Delete(_("Delete")))
+    actions = Actions(formactions.DeleteAction(_("Delete")),
+                      formactions.CancelAction(_("Cancel")))
