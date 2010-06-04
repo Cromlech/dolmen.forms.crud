@@ -28,6 +28,8 @@ class Add(ApplicationForm):
     grok.name('dolmen.add')
     grok.context(IFactoryAdding)
 
+    submissionError = None
+
     @property
     def label(self):
         return zope.i18n.translate(self.context.factory.title,
@@ -61,6 +63,8 @@ class Edit(ApplicationForm):
     ignoreContent = False
     ignoreRequest = False
     actions = Actions(formactions.Update(_("Update")))
+
+    submissionError = None
 
     @property
     def label(self):
@@ -114,4 +118,5 @@ class Delete(ApplicationForm):
 
     label = _(u"Delete")
     description = _(u"Are you really sure ?")
+    submissionError = None
     actions = Actions(formactions.Delete(_("Delete")))

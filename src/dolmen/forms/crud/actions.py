@@ -22,6 +22,7 @@ class Add(base.Action):
     def __call__(self, form):
         data, errors = form.extractData()
         if errors:
+            form.submissionError = errors
             return FAILURE
 
         obj = self.factory(**data)
@@ -41,6 +42,7 @@ class Update(base.Action):
     def __call__(self, form):
         data, errors = form.extractData()
         if errors:
+            form.submissionError = errors
             return FAILURE
 
         apply_data_event(form.fields, form.context, data)
