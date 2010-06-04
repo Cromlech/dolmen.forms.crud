@@ -192,7 +192,8 @@ presence of the fields and the label on the form itself::
   
   >>> addform.updateForm()
   >>> for action in addform.actions: print action
-  <Add Add>
+  <AddAction Add>
+  <CancelAction Cancel>
 
   >>> security.endInteraction()
 
@@ -230,7 +231,8 @@ edited::
 
   >>> editform.updateForm()
   >>> for action in editform.actions: print action
-  <Update Update>
+  <UpdateAction Update>
+  <CancelAction Cancel>
 
   >>> editform.fields.keys()
   ['title', 'water']
@@ -311,7 +313,8 @@ A delete form is a simple form with no fields, that only provides a
 
   >>> deleteform.updateForm()
   >>> for action in deleteform.actions: print action
-  <Delete Delete>
+  <DeleteAction Delete>
+  <CancelAction Cancel>
 
   >>> len(deleteform.fields)
   0

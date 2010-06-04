@@ -27,8 +27,11 @@ msgstr "Voir"
 msgid "Delete"
 msgstr "Supprimer"
 
+msgid "Cancel"
+msgstr "Annuler"
+
 msgid "Are you really sure ?"
-msgstr "Etes-vous vraiment sur ?"
+msgstr "Êtes-vous vraiment sûr(e) ?"
 
 msgid "Confirm deletion"
 msgstr "Confirmer la suppression"

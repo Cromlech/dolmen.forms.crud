@@ -17,7 +17,7 @@ class AddAction(base.Action):
     """
 
     def __init__(self, title, factory):
-        super(Add, self).__init__(title)
+        super(AddAction, self).__init__(title)
         self.factory = factory
 
     def __call__(self, form):

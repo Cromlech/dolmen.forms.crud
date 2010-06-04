@@ -4,6 +4,7 @@ Changelog
 1.0a2 (2010-06-05)
 ------------------
 
+* Added the CancelAction to the input forms.
 * Fixed a bug where the errors where not set correctly on submission
   failure.
 
