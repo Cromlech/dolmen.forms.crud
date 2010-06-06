@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from zeam.form.ztk.actions import CancelAction
-from dolmen.forms.base.utils import apply_data_event
+from dolmen.forms.base.utils import set_fields_data, apply_data_event
 from zeam.form import base
 from zeam.form.base.markers import SUCCESS, FAILURE
 from zope.event import notify
@@ -26,7 +26,8 @@ class AddAction(base.Action):
             form.submissionError = errors
             return FAILURE
 
-        obj = self.factory(**data)
+        obj = self.factory()
+        set_fields_data(form.fields, obj, data)
         notify(ObjectCreatedEvent(obj))
         form.context.add(obj)
 
@@ -46,8 +47,7 @@ class UpdateAction(base.Action):
             form.submissionError = errors
             return FAILURE
 
-        apply_data_event(form.fields, form.context, data)
-
+        apply_data_event(form.fields, form.getContentData(), data)
         form.flash(_(u"Content updated"))
         form.redirect(form.url(form.context))
 
@@ -61,8 +61,9 @@ class DeleteAction(base.Action):
     failureMessage = _(u"This object could not be deleted.")
     
     def __call__(self, form):
-        container = form.context.__parent__
-        name = form.context.__name__
+        content = form.getContentData()
+        container = content.__parent__
+        name = content.__name__
 
         if name in container:
             try:
