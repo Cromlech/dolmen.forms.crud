@@ -62,8 +62,12 @@ class DeleteAction(base.Action):
     
     def __call__(self, form):
         content = form.getContentData()
-        container = content.__parent__
-        name = content.__name__
+        if base.IDataManager.providedBy(content):
+            container = content.content.__parent__
+            name = content.content.__name__
+        else:
+            container = content.__parent__
+            name = content.__name__
 
         if name in container:
             try:
