@@ -4,6 +4,7 @@
 from zeam.form.ztk.actions import CancelAction
 from dolmen.forms.base.utils import set_fields_data, apply_data_event
 from zeam.form import base
+from zeam.form.base.interfaces import IDataManager
 from zeam.form.base.markers import SUCCESS, FAILURE
 from zope.event import notify
 from zope.i18nmessageid import MessageFactory
@@ -62,7 +63,7 @@ class DeleteAction(base.Action):
     
     def __call__(self, form):
         content = form.getContentData()
-        if base.IDataManager.providedBy(content):
+        if IDataManager.providedBy(content):
             container = content.content.__parent__
             name = content.content.__name__
         else:
