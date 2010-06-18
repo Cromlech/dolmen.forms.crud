@@ -21,6 +21,12 @@ msgstr "Ajouter"
 msgid "Edit"
 msgstr "Editer"
 
+msgid "edit_action"
+msgstr "Editer: ${name}"
+
+msgid "Update"
+msgstr "Appliquer les modifications"
+
 msgid "View"
 msgstr "Voir"
 
@@ -30,8 +36,23 @@ msgstr "Supprimer"
 msgid "Cancel"
 msgstr "Annuler"
 
+msgid "Content created"
+msgstr "Contenu créé"
+
+msgid "Content updated"
+msgstr "Contenu mis à jour"
+
 msgid "Are you really sure ?"
 msgstr "Êtes-vous vraiment sûr(e) ?"
 
 msgid "Confirm deletion"
 msgstr "Confirmer la suppression"
+
+msgid "The object has been deleted."
+msgstr "L'objet a été effacé."
+
+msgid "This object could not be deleted."
+msgstr "L'objet a pas pu être effacé."
+
+msgid "Errors occured during the form processing"
+msgstr "Des erreurs sont survenues lors du traitement du formulaire"
