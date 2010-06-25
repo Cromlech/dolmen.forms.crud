@@ -10,8 +10,10 @@
   <include package="zope.principalregistry" file="meta.zcml" />
 
   <!-- Dependencies -->
+  <include package="zope.i18n" />
   <include package="zope.security" />
   <include package="zope.container" />
+  <include package="zope.publisher" />
   <include package="dolmen.forms.crud" />
   <include package="grokcore.message" file="ftesting.zcml" />
 
