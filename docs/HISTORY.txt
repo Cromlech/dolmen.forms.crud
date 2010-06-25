@@ -1,6 +1,17 @@
 Changelog
 =========
 
+1.0a3 (2010-06-25)
+------------------
+
+* Added missing translations (french)
+* Actions now use the form `getContent` method, to get the proper form
+  content. In addition, the content is now tested, to handle
+  DataManagers. Import fix : the Delete action now behaves properly.
+* Using the latest version of ``dolmen.forms.base`` with improved
+  errors handling and data processing and notification.
+
+
 1.0a2 (2010-06-05)
 ------------------
 
