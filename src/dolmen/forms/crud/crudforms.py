@@ -5,17 +5,15 @@ import dolmen.content as content
 import zeam.form.ztk as form
 import grokcore.component as grok
 
-from dolmen.forms.base import ApplicationForm
-from dolmen.forms.crud import actions as formactions
+from dolmen.forms.base import ApplicationForm, DISPLAY
+from dolmen.forms.crud import actions as formactions, i18n as _
 from dolmen.forms.crud.interfaces import IFactoryAdding, IFieldsCustomization
 from dolmen.forms.crud.utils import queryClassMultiAdapter
 
 from zeam.form.base import Fields, Actions
 from zope.cachedescriptors.property import CachedProperty
 from zope.component import queryMultiAdapter
-from zope.i18nmessageid import MessageFactory
-
-_ = MessageFactory("dolmen.forms.crud")
+from zope.i18nmessageid import Message
 
 
 class Add(ApplicationForm):
@@ -32,8 +30,12 @@ class Add(ApplicationForm):
 
     @property
     def label(self):
-        return zope.i18n.translate(self.context.factory.title,
-                                   context=self.request)
+        name = self.context.factory.name
+        if isinstance(name, Message):
+            name = zope.i18n.translate(name, context=self.request)
+        return zope.i18n.translate(
+            _(u"add_action", default="Add: $name",
+              mapping={'name': name}), context=self.request)
 
     @CachedProperty
     def fields(self):
@@ -70,7 +72,7 @@ class Edit(ApplicationForm):
     @property
     def label(self):
         label = _(u"edit_action", default=u"Edit: $name",
-                 mapping={"name": self.context.title})
+                  mapping={"name": self.context.title})
         return zope.i18n.translate(label, context=self.request)
 
     @CachedProperty
@@ -90,7 +92,7 @@ class Display(ApplicationForm):
     grok.title(_(u"View"))
     grok.context(content.IBaseContent)
 
-    mode = "display"
+    mode = DISPLAY
     ignoreRequest = True
     ignoreContent = False
 

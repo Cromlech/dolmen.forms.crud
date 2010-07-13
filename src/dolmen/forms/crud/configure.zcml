@@ -4,14 +4,14 @@
     xmlns:grok="http://namespaces.zope.org/grok">
 
   <!-- Dependencies -->
+  <include package="dolmen.content" />
   <include package="zeam.form.ztk" />
   <include package="zeam.form.layout" />
-  <include package="megrok.layout" />
-  <include package="dolmen.content" />
 
   <!-- Translations -->
   <i18n:registerTranslations directory="locales" />
 
+  <!-- Grokking package -->
   <grok:grok package="." />
 
 </configure>

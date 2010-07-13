@@ -18,6 +18,9 @@ msgstr ""
 msgid "Add"
 msgstr "Ajouter"
 
+msgid "add_action"
+msgstr "Ajouter: ${name}"
+
 msgid "Edit"
 msgstr "Editer"
 

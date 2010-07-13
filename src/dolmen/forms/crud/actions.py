@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from dolmen.forms.crud import i18n as _
 from dolmen.forms.base.utils import set_fields_data, apply_data_event
 from zeam.form import base
 from zeam.form.base.interfaces import IDataManager
 from zeam.form.base.markers import SUCCESS, FAILURE
 from zeam.form.ztk.actions import CancelAction
 from zope.event import notify
-from zope.i18nmessageid import MessageFactory
 from zope.lifecycleevent import ObjectCreatedEvent
-
-_ = MessageFactory("dolmen.forms.crud")
 
 
 class AddAction(base.Action):
