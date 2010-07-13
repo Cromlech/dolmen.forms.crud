@@ -1,2 +1,2 @@
-recursive-include src/dolmen/forms/crud *.txt *.py *.zcml *.pt *.po
+recursive-include src/dolmen/forms/crud *.txt *.py *.zcml *.pt *.po *.mo
 recursive-include docs *.txt
