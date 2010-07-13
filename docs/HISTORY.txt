@@ -8,6 +8,7 @@ Changelog
 * Added correct translations.
 * Forms mode are now using mode markers.
 
+
 1.0a3 (2010-06-25)
 ------------------
 
