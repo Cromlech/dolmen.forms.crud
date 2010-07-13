@@ -16,7 +16,7 @@ def notify_fields_creation(ob, event):
     """
     schemas = schema.bind().get(ob)
     fields = Fields(*schemas)
-    
+
     for field_repr in fields:
         field = field_repr._field
         if field.get(ob) != field.missing_value:

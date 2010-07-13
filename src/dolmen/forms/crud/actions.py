@@ -57,7 +57,7 @@ class DeleteAction(base.Action):
     """
     successMessage = _(u"The object has been deleted.")
     failureMessage = _(u"This object could not be deleted.")
-    
+
     def __call__(self, form):
         content = form.getContentData()
         if IDataManager.providedBy(content):
