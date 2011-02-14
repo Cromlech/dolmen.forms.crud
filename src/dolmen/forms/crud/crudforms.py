@@ -2,17 +2,15 @@
 
 import zope.i18n
 import dolmen.content as content
-import zeam.form.ztk as form
 import grokcore.component as grok
 
 from dolmen.forms.base import ApplicationForm, DISPLAY
 from dolmen.forms.crud import actions as formactions, i18n as _
-from dolmen.forms.crud.interfaces import IFactoryAdding, IFieldsCustomization
-from dolmen.forms.crud.utils import queryClassMultiAdapter
+from dolmen.forms.crud.interfaces import IFactoryAdding
+from dolmen.forms.crud.utils import getSchemaFields
 
-from zeam.form.base import Fields, Actions
+from zeam.form.base import Actions
 from zope.cachedescriptors.property import CachedProperty
-from zope.component import queryMultiAdapter
 from zope.dublincore.interfaces import IDCDescriptiveProperties
 from zope.i18nmessageid import Message
 
@@ -38,16 +36,8 @@ class Add(ApplicationForm):
 
     @CachedProperty
     def fields(self):
-        ifaces = self.context.factory.getSchema()
-        fields = Fields(*ifaces).omit('__parent__')
-
-        modifier = queryClassMultiAdapter(
-            (self.context.factory.factory, self, self.request),
-            self.context, IFieldsCustomization)
-
-        if modifier is not None:
-            return modifier(fields)
-        return fields
+        return getSchemaFields(
+            self, self.context.factory.factory, '__parent__')
 
     @CachedProperty
     def actions(self):
@@ -74,14 +64,9 @@ class Edit(ApplicationForm):
 
     @CachedProperty
     def fields(self):
-        iface = content.schema.bind().get(self.context)
-        fields = Fields(*iface).omit('__parent__')
-        modifier = queryMultiAdapter(
-            (self.context, self, self.request), IFieldsCustomization)
-
-        if modifier is not None:
-            return modifier(fields)
-        return fields
+        return getSchemaFields(
+            self, self.getContentData().getContent(),
+            '__parent__')
 
 
 class Display(ApplicationForm):
@@ -102,14 +87,9 @@ class Display(ApplicationForm):
 
     @CachedProperty
     def fields(self):
-        iface = content.schema.bind().get(self.context)
-        fields = form.Fields(*iface).omit('__parent__', 'title')
-        modifier = queryMultiAdapter(
-            (self.context, self, self.request), IFieldsCustomization)
-
-        if modifier is not None:
-            return modifier(fields)
-        return fields
+        return getSchemaFields(
+            self, self.getContentData().getContent(),
+            '__parent__', 'title')
 
 
 class Delete(ApplicationForm):
@@ -121,6 +101,5 @@ class Delete(ApplicationForm):
 
     label = _(u"Delete")
     description = _(u"Are you really sure ?")
-    submissionError = None
     actions = Actions(formactions.DeleteAction(_("Delete")),
                       formactions.CancelAction(_("Cancel")))

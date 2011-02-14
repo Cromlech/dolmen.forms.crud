@@ -2,7 +2,7 @@ from os.path import join
 from setuptools import setup, find_packages
 
 name = 'dolmen.forms.crud'
-version = '1.0b2'
+version = '1.0b3'
 readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 

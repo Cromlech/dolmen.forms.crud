@@ -59,13 +59,9 @@ class DeleteAction(base.Action):
     failureMessage = _(u"This object could not be deleted.")
 
     def __call__(self, form):
-        content = form.getContentData()
-        if IDataManager.providedBy(content):
-            container = content.content.__parent__
-            name = content.content.__name__
-        else:
-            container = content.__parent__
-            name = content.__name__
+        content = form.getContentData().getContent()
+        container = content.__parent__
+        name = content.__name__
 
         if name in container:
             try:
