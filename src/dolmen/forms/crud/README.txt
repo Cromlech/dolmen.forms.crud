@@ -361,8 +361,6 @@ works with bare contents.
 Create
 ------
 
-TODO
-
 Form customization
 ==================
 
