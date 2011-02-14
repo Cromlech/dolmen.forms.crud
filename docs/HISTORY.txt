@@ -1,6 +1,15 @@
 Changelog
 =========
 
+1.0b2 (2011-02-14)
+------------------
+
+* Adapted to echo the latest ``dolmen.content`` changes.
+* `title` is now obtained thanks to `DCDescriptiveProperties` from
+  ``zope.dublincore`` (for the labels).
+* Adapted the tests for the latest ``zeam.form.base`` changes.
+
+
 1.0b1 (2010-07-13)
 ------------------
 

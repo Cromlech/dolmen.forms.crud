@@ -2,7 +2,7 @@ from os.path import join
 from setuptools import setup, find_packages
 
 name = 'dolmen.forms.crud'
-version = '1.0b1'
+version = '1.0b2'
 readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
@@ -10,7 +10,6 @@ install_requires = [
     'dolmen.content >= 0.7',
     'dolmen.forms.base >= 1.0b1',
     'grokcore.component',
-    'grokcore.message',
     'setuptools',
     'zeam.form.base',
     'zeam.form.layout',
@@ -18,6 +17,7 @@ install_requires = [
     'zope.cachedescriptors',
     'zope.component >= 3.9.1',
     'zope.container',
+    'zope.dublincore',
     'zope.event',
     'zope.i18n',
     'zope.i18nmessageid',
@@ -33,11 +33,12 @@ install_requires = [
 tests_require = [
     'grokcore.message',
     'megrok.layout',
+    'zope.annotation',
     'zope.i18n',
     'zope.principalregistry',
     'zope.securitypolicy',
+    'zope.session',
     'zope.site',
-    'zope.testing',
     ]
 
 setup(name = name,

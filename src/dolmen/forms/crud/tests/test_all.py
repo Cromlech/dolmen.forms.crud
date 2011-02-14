@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import unittest, doctest
+import doctest
+import unittest
 import zope.component
 
 from dolmen.forms.crud import tests
