@@ -29,7 +29,6 @@ Let's first create a container in which we'll test the adding view::
   >>> from dolmen.forms.crud.tests import Sietch
 
   >>> sietch = Sietch()
-  >>> sietch.title = u'Tabr'
   >>> dolmen.content.IBaseContent.providedBy(sietch)
   True
   
@@ -145,6 +144,7 @@ operations such as naming and persistence.
 
 Generic forms
 =============
+
 
 `dolmen.forms.crud` provides a set of ready-to-use base classes that
 will auto-generate forms based on `dolmen.content` schemas.
@@ -346,6 +346,21 @@ When confirmed, the form tries to delete the object::
   'http://127.0.0.1/sietch'
 
   >>> security.endInteraction()
+  
+
+Generic forms without Dublin Core
+=====================================
+
+Tests run above where using a content defining a title, let's verify it still
+works with bare contents.
+
+   >>> sietch = root['sietch']
+
+
+Create
+------
+
+TODO
 
 Form customization
 ==================

@@ -13,7 +13,9 @@ from dolmen.forms.crud.utils import queryClassMultiAdapter
 from zeam.form.base import Fields, Actions
 from zope.cachedescriptors.property import CachedProperty
 from zope.component import queryMultiAdapter
+from zope.dublincore.interfaces import IDCDescriptiveAttributes
 from zope.i18nmessageid import Message
+
 
 
 class Add(ApplicationForm):
@@ -60,7 +62,7 @@ class Edit(ApplicationForm):
     grok.baseclass()
     grok.name('edit')
     grok.title(_(u"Edit"))
-    grok.context(content.IBaseContent)
+    grok.context(content.IContent)
 
     ignoreContent = False
     ignoreRequest = False
@@ -72,7 +74,7 @@ class Edit(ApplicationForm):
     @property
     def label(self):
         label = _(u"edit_action", default=u"Edit: $name",
-                  mapping={"name": self.context.title})
+                  mapping={"name": self.context.__name__})
         return zope.i18n.translate(label, context=self.request)
 
     @CachedProperty
@@ -90,7 +92,7 @@ class Edit(ApplicationForm):
 class Display(ApplicationForm):
     grok.baseclass()
     grok.title(_(u"View"))
-    grok.context(content.IBaseContent)
+    grok.context(content.IContent)
 
     mode = DISPLAY
     ignoreRequest = True
@@ -98,7 +100,8 @@ class Display(ApplicationForm):
 
     @property
     def label(self):
-        return self.context.title
+        dc = IDCDescriptiveAttributes(self.context, None)
+        return dc.title if dc is not None or self.context.name
 
     @CachedProperty
     def fields(self):
@@ -117,7 +120,7 @@ class Delete(ApplicationForm):
     """
     grok.baseclass()
     grok.title(_(u"Delete"))
-    grok.context(content.IBaseContent)
+    grok.context(content.IContent)
 
     label = _(u"Delete")
     description = _(u"Are you really sure ?")
