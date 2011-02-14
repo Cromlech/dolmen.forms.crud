@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import unittest
+import unittest, doctest
 import zope.component
 
 from dolmen.forms.crud import tests
@@ -10,7 +10,6 @@ from zope.component.testlayer import ZCMLFileLayer
 from zope.interface import Interface
 from zope.site.folder import rootFolder
 from zope.site.site import LocalSiteManager, SiteManagerAdapter
-from zope.testing import doctest
 from zope.traversing.testing import setUp as traversingSetUp
 
 

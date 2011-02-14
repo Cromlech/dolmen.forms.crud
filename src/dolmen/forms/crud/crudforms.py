@@ -13,9 +13,8 @@ from dolmen.forms.crud.utils import queryClassMultiAdapter
 from zeam.form.base import Fields, Actions
 from zope.cachedescriptors.property import CachedProperty
 from zope.component import queryMultiAdapter
-from zope.dublincore.interfaces import IDCDescriptiveAttributes
+from zope.dublincore.interfaces import IDCDescriptiveProperties
 from zope.i18nmessageid import Message
-
 
 
 class Add(ApplicationForm):
@@ -27,8 +26,6 @@ class Add(ApplicationForm):
     grok.title(_(u"Add"))
     grok.name('dolmen.add')
     grok.context(IFactoryAdding)
-
-    submissionError = None
 
     @property
     def label(self):
@@ -69,8 +66,6 @@ class Edit(ApplicationForm):
     actions = Actions(formactions.UpdateAction(_("Update")),
                       formactions.CancelAction(_("Cancel")))
 
-    submissionError = None
-
     @property
     def label(self):
         label = _(u"edit_action", default=u"Edit: $name",
@@ -100,8 +95,10 @@ class Display(ApplicationForm):
 
     @property
     def label(self):
-        dc = IDCDescriptiveAttributes(self.context, None)
-        return dc.title if dc is not None or self.context.name
+        dc = IDCDescriptiveProperties(self.context, None)
+        if dc is not None and dc.title:
+            return dc.title
+        return getattr(self.context, '__name__', u'')
 
     @CachedProperty
     def fields(self):

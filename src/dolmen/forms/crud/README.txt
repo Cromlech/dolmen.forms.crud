@@ -29,7 +29,7 @@ Let's first create a container in which we'll test the adding view::
   >>> from dolmen.forms.crud.tests import Sietch
 
   >>> sietch = Sietch()
-  >>> dolmen.content.IBaseContent.providedBy(sietch)
+  >>> dolmen.content.IContent.providedBy(sietch)
   True
   
   >>> from zope.site.hooks import getSite
@@ -185,7 +185,7 @@ presence of the fields and the label on the form itself::
   <dolmen.forms.crud.tests.AddForm object at ...>
 
   >>> print addform.label
-  Fremen training camp
+  Add: Fremen Warrior
 
   >>> addform.fields.keys()
   ['title', 'water']
@@ -220,7 +220,8 @@ edited::
   >>> post = TestRequest(form={
   ...     'form.field.water': '25',
   ...     'form.field.title': u'Stilgar',
-  ...     'form.action.update': u'Update'}
+  ...     'form.action.update': u'Update'},
+  ...	  REQUEST_METHOD='POST',
   ...     )
 
   >>> security.newInteraction(post)
@@ -286,7 +287,6 @@ page::
       <div class="field">
         <label class="field-label" for="form-field-water">Number water gallons owned</label>
         <span class="field-required">(required)</span>
-        <br />
         25
       </div>
     </div>
@@ -322,7 +322,8 @@ A delete form is a simple form with no fields, that only provides a
 When confirmed, the form tries to delete the object::
 
   >>> post = TestRequest(form={
-  ...     'form.action.delete': u'Delete'}
+  ...     'form.action.delete': u'Delete'},
+  ...	  REQUEST_METHOD='POST',
   ...     )
 
   >>> security.newInteraction(post)
@@ -397,7 +398,7 @@ We can now register and test the customization::
 
   >>> addform = addingview.traverse('fremen', [])
   >>> for field in addform.fields: print field
-  <TextLineSchemaField Title>
+  <TextLineSchemaField Name of the warrior>
 
 One important thing is noticeable here : the 'RemoveWater' adapter was
 registered for the 'Fremen' component. To be able to lookup the
@@ -460,7 +461,8 @@ We provide data for the update::
   >>> request = TestRequest(form={
   ...     'form.field.water': '10',
   ...     'form.field.title': u'Sihaya',
-  ...     'form.action.update': u'Update'}
+  ...     'form.action.update': u'Update'},
+  ...	  REQUEST_METHOD='POST',
   ...     )
 
   >>> security.newInteraction(request)
@@ -481,8 +483,7 @@ event's descriptions::
 
   >>> for desc in logger[0].descriptions:
   ...   print "%r: %s" % (desc.interface, desc.attributes)
-  <InterfaceClass dolmen.content.interfaces.IBaseContent>: ('title',)
-  <InterfaceClass dolmen.forms.crud.tests.IDesertWarrior>: ('water',)
+  <InterfaceClass dolmen.forms.crud.tests.IDesertWarrior>: ('water', 'title')
 
   >>> chani.title
   u'Sihaya'
@@ -519,8 +520,9 @@ Using an add form, the IFieldUpdate adapters should be called during an objects 
 
   >>> request = TestRequest(form={
   ...     'form.field.title': u'Liet',
-  ...     'form.action.add': u'Add',
-  ...     })
+  ...     'form.action.add': u'Add'},
+  ...	  REQUEST_METHOD='POST',
+  ...     )
 
   >>> request.setPrincipal(manager)
   >>> interaction = security.newInteraction(request)
@@ -550,7 +552,8 @@ We can do the same thing for the edit form::
   >>> request = TestRequest(form={
   ...     'form.field.water': '50',
   ...     'form.field.title': u'Imperial weather specialist',
-  ...     'form.action.update': u'Update'}
+  ...     'form.action.update': u'Update'},
+  ...	  REQUEST_METHOD='POST',
   ...     )
 
   >>> request.setPrincipal(manager)
@@ -572,7 +575,8 @@ anything::
 
   >>> request = TestRequest(form={
   ...     'form.field.water': '40',
-  ...     'form.action.update': u'Update'}
+  ...     'form.action.update': u'Update'},
+  ...	  REQUEST_METHOD='POST',
   ...     )
 
   >>> editform = getMultiAdapter((kynes, request), name='edit')

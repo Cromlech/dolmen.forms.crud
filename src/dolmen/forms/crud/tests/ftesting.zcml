@@ -11,15 +11,17 @@
 
   <!-- Dependencies -->
   <include package="zope.i18n" />
+  <include package="zope.session" />
   <include package="zope.security" />
   <include package="zope.container" />
   <include package="zope.publisher" />
-  <include package="dolmen.forms.crud" />
+  <include package="zope.dublincore" />
+  <include package="zope.annotation" />
   <include package="grokcore.message" file="ftesting.zcml" />
+  <include package="dolmen.forms.crud" />
 
   <!-- Grokking tests -->
-  <grok:grok package="dolmen.forms.crud.tests" />
-
+  <grok:grok package="." />
 
   <!-- Security -->
   <securityPolicy
