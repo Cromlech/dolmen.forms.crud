@@ -10,6 +10,7 @@ install_requires = [
     'dolmen.content >= 0.7.1',
     'dolmen.forms.base >= 1.0b1',
     'grokcore.component',
+    'martian',
     'setuptools',
     'zeam.form.base',
     'zeam.form.layout',
