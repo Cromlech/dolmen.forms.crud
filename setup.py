@@ -2,12 +2,12 @@ from os.path import join
 from setuptools import setup, find_packages
 
 name = 'dolmen.forms.crud'
-version = '1.0b4'
+version = '1.0b5'
 readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
-    'dolmen.content >= 0.7',
+    'dolmen.content >= 0.7.1',
     'dolmen.forms.base >= 1.0b1',
     'grokcore.component',
     'setuptools',

@@ -407,14 +407,18 @@ We can test a more complex example, returning a brand new instance of
 Fields::
 
   >>> import dolmen.forms.base
+  >>> from dolmen.forms.crud.utils import getSchemaFields
+
   >>> class AddFieldToView(crud.FieldsCustomizer):
   ...    grokcore.component.adapts(Fremen, crud.Display, None)
   ...
   ...    def __call__(self, fields):
   ...       """Returns a new instance of Fields.
   ...       """
-  ...       schema = dolmen.content.schema.bind().get(self.context)
-  ...       return dolmen.forms.base.Fields(*schema)
+  ...       schema = dolmen.content.get_schema(self.context)
+  ...       if schema:
+  ...           return dolmen.forms.base.Fields(*schema)
+  ...       return dolmen.forms.base.Fields()
 
   >>> grokcore.component.testing.grok_component('viewer', AddFieldToView)
   True

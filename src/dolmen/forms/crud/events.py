@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import grokcore.component as grok
-from dolmen.content import schema, IContent
+from dolmen.content import get_schema, IContent
 from dolmen.forms.base import Fields, IFieldUpdate
 from zope.component import getAdapters
 from zope.lifecycleevent import IObjectModifiedEvent, IObjectCreatedEvent
@@ -14,9 +14,9 @@ def notify_fields_creation(ob, event):
     to actually interact at the field level, after it gets a value for the
     first time.
     """
-    schemas = schema.bind(default=None).get(ob)
-    if schemas:
-        fields = Fields(*schemas)
+    ifaces = get_schema(ob)
+    if ifaces:
+        fields = Fields(*ifaces)
 
         for field_repr in fields:
             field = field_repr._field

@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.0b5 (2011-02-16)
+------------------
+
+* We now use the new `get_schema` util function from
+  ``dolmen.content`` to get the `schema` value. This allows a
+  normalized way to deal with schema retrieval.
+
+
 1.0b4 (2011-02-16)
 ------------------
 

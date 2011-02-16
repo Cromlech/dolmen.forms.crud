@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from martian.util import isclass
-from dolmen.content import schema
+from dolmen.content import get_schema
 from dolmen.forms.crud.interfaces import IFieldsCustomization
 from zeam.form.base import Fields
 from zope.component import getGlobalSiteManager, queryMultiAdapter
@@ -33,7 +33,7 @@ def getSchemaFields(form, component, *ignore):
     else:
         lookup = queryMultiAdapter
 
-    ifaces = schema.bind(default=None).get(component)
+    ifaces = get_schema(component)
     if ifaces:
         fields = Fields(*ifaces).omit(*ignore)
         modifier = lookup((component, form, form.request),
