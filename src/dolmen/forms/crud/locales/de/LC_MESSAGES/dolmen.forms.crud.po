@@ -28,7 +28,7 @@ msgid "edit_action"
 msgstr "Bearbeiten: ${name}"
 
 msgid "Update"
-msgstr "Upgedated"
+msgstr "Aktualisieren"
 
 msgid "View"
 msgstr "Ansicht"
