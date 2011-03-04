@@ -43,7 +43,7 @@ msgid "Content created"
 msgstr "Inhalt erstellt"
 
 msgid "Content updated"
-msgstr "Inhalt upgedated"
+msgstr "Inhalt aktualisiert"
 
 msgid "Are you really sure ?"
 msgstr "Sind Sie wirklich sicher ?"
