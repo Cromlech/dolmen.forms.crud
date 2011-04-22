@@ -8,6 +8,19 @@ provides a collection of base classes to add, edit, and access
 content. It provides adapters to customize the fields of a form.
 
 
+Setting up the components
+=========================
+
+  >>> from dolmen.forms.ztk import testing
+  >>> testing.grok('dolmen.forms.crud')
+
+  >>> from cromlech.io.interfaces import IPublicationRoot
+  >>> from zope.location import Location
+  >>> 
+
+  >>> root = 
+
+
 Adding view
 ===========
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import zope.schema
-import megrok.layout
 import dolmen.content
 import grokcore.component as grok
 from zope.interface import Interface
@@ -78,10 +77,3 @@ class Harkonnen(dolmen.content.Content):
     """
     dolmen.content.name('Harkonnen')
     dolmen.content.nofactory()
-
-
-class MyLayout(megrok.layout.Layout):
-    grok.context(Interface)
-
-    def render(self):
-        return self.view.content()

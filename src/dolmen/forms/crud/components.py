@@ -4,18 +4,18 @@ import zope.i18n
 import dolmen.content as content
 import grokcore.component as grok
 
-from dolmen.forms.base import ApplicationForm, DISPLAY
+from dolmen.forms.base import Form, DISPLAY
 from dolmen.forms.crud import actions as formactions, i18n as _
 from dolmen.forms.crud.interfaces import IFactoryAdding
 from dolmen.forms.crud.utils import getSchemaFields
 
-from zeam.form.base import Actions
+from dolmen.forms.base import Actions
 from zope.cachedescriptors.property import CachedProperty
 from zope.dublincore.interfaces import IDCDescriptiveProperties
 from zope.i18nmessageid import Message
 
 
-class Add(ApplicationForm):
+class Add(Form):
     """The add form itself is not protected. The security is checked on
     'update'. It checks if the 'require' directive of the factored item
     is respected on the context.
@@ -45,7 +45,7 @@ class Add(ApplicationForm):
         return Actions(add, formactions.CancelAction(_("Cancel")))
 
 
-class Edit(ApplicationForm):
+class Edit(Form):
     grok.baseclass()
     grok.name('edit')
     grok.title(_(u"Edit"))
@@ -69,7 +69,7 @@ class Edit(ApplicationForm):
             '__parent__')
 
 
-class Display(ApplicationForm):
+class Display(Form):
     grok.baseclass()
     grok.title(_(u"View"))
     grok.context(content.IContent)
@@ -92,7 +92,7 @@ class Display(ApplicationForm):
             '__parent__', 'title')
 
 
-class Delete(ApplicationForm):
+class Delete(Form):
     """A confirmation for to delete an object.
     """
     grok.baseclass()

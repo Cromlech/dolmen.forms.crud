@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import grokcore.component as grok
-from zeam.form.base.interfaces import IFormCanvas
+from dolmen.forms.base.interfaces import IFormCanvas
 from dolmen.forms.crud import IFieldsCustomization
 
 

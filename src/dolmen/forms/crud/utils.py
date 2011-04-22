@@ -2,8 +2,8 @@
 
 from martian.util import isclass
 from dolmen.content import get_schema
+from dolmen.forms.base import Fields
 from dolmen.forms.crud.interfaces import IFieldsCustomization
-from zeam.form.base import Fields
 from zope.component import getGlobalSiteManager, queryMultiAdapter
 from zope.interface import implementedBy, providedBy
 

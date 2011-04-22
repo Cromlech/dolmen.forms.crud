@@ -1,15 +1,26 @@
 # -*- coding: utf-8 -*-
 
-from dolmen.forms.crud import i18n as _
+from dolmen.location import get_absolute_url
+from dolmen.forms.base import Action
+from dolmen.forms.base.markers import SUCCESS, FAILURE
 from dolmen.forms.base.utils import set_fields_data, apply_data_event
-from zeam.form import base
-from zeam.form.base.markers import SUCCESS, FAILURE
-from zeam.form.ztk.actions import CancelAction  # Convenience import
+from dolmen.forms.crud import i18n as _
+from dolmen.forms.ztk.actions import CancelAction  # Convenience import
 from zope.event import notify
 from zope.lifecycleevent import ObjectCreatedEvent
 
 
-class AddAction(base.Action):
+def message(message):
+    # This needs to be implemented
+    pass
+
+
+def redirect(url):
+    # This needs to be implemented
+    pass
+
+
+class AddAction(Action):
     """Add action for an IAdding context.
     """
 
@@ -28,13 +39,13 @@ class AddAction(base.Action):
         notify(ObjectCreatedEvent(obj))
         form.context.add(obj)
 
-        form.flash(_(u"Content created"))
-        form.redirect(form.url(obj))
+        message(_(u"Content created"))
+        redirect(get_absolute_url(obj, form.request))
 
         return SUCCESS
 
 
-class UpdateAction(base.Action):
+class UpdateAction(Action):
     """Update action for any locatable object.
     """
 
@@ -45,13 +56,13 @@ class UpdateAction(base.Action):
             return FAILURE
 
         apply_data_event(form.fields, form.getContentData(), data)
-        form.flash(_(u"Content updated"))
-        form.redirect(form.url(form.context))
+        message(_(u"Content updated"))
+        redirect(get_absolute_url(obj, form.request))
 
         return SUCCESS
 
 
-class DeleteAction(base.Action):
+class DeleteAction(Action):
     """Delete action for any locatable context.
     """
     successMessage = _(u"The object has been deleted.")
@@ -66,13 +77,13 @@ class DeleteAction(base.Action):
             try:
                 del container[name]
                 form.status = self.successMessage
-                form.flash(form.status)
-                form.redirect(form.url(container))
+                message(form.status)
+                redirect(get_absolute_url(container, form.request))
                 return SUCCESS
             except ValueError:
                 pass
 
         form.status = self.failureMessage
-        form.flash(form.status)
-        form.redirect(form.url(form.context))
+        message(form.status)
+        redirect(get_absolute_url(form.context, form.request))
         return FAILURE

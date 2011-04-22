@@ -3,7 +3,6 @@
 import grokcore.component as grok
 from dolmen.content import get_schema, IContent
 from dolmen.forms.base import Fields, IFieldUpdate
-from zope.component import getAdapters
 from zope.lifecycleevent import IObjectModifiedEvent, IObjectCreatedEvent
 
 
@@ -21,7 +20,8 @@ def notify_fields_creation(ob, event):
         for field_repr in fields:
             field = field_repr._field
             if field.get(ob) != field.missing_value:
-                handlers = getAdapters((ob, field), IFieldUpdate)
+                handlers = grok.queryOrderedMultiSubscriptions(
+                    (ob, field), IFieldUpdate)
                 for handler in handlers:
                     # Iteration through the generator
                     pass
@@ -36,7 +36,8 @@ def notify_fields_update(ob, event):
     for desc in event.descriptions:
         for name in desc.attributes:
             field = desc.interface[name]
-            handlers = getAdapters((ob, field), IFieldUpdate)
+            handlers = grok.queryOrderedMultiSubscriptions(
+                    (ob, field), IFieldUpdate)
             for handler in handlers:
                 # Iteration through the generator
                 pass
