@@ -3,7 +3,7 @@ dolmen.forms.crud
 =================
 
 `dolmen.forms.crud` is a module which helps developers create their
-C.R.U.D forms using `Grok`, `zeam.form` and `dolmen.content`. It
+C.R.U.D forms using `Grok` and `dolmen.forms`. It
 provides a collection of base classes to add, edit, and access
 content. It provides adapters to customize the fields of a form.
 
@@ -27,7 +27,7 @@ Defining some actors
 
 
   >>> class IDesertWarrior(Interface):
-  ...     """Defines a warrior living in the desert. Can be annotated.
+  ...     """Defines a warrior living in the desert.
   ...     """
   ...     title = zope.schema.TextLine(
   ...         title=u"Name of the warrior",
@@ -88,18 +88,23 @@ action. It allows pluggability at the container level and handles
 naming and persistence. This 'adding' action is prototyped by an
 interface called `IAdding` and precised in the `IFactoryAdding`.
 
-  >>> from dolmen.forms.crud import IAdding, IFactoryAdding
+  >>> from dolmen.forms.crud import IFactoryAdding
   >>> from zope.component.factory import Factory
   >>> from zope.interface import implements
+  >>> from zope.interface import verify
 
-  >>> class Adding(Location):
+  >>> class Adding(object):
+  ...     """The component capable of adding objects using a factory
+  ...
+  ...     objects id are incremental
+  ...     """
+  ...
   ...     implements(IFactoryAdding)
   ...
   ...     def __init__(self, context, request, factory):
   ...         self.context = context
   ...         self.request = request
   ...         self.factory = factory
-  ...         self.__parent__ = context
   ...
   ...     def add(self, obj):
   ...         id = str(len(self.context.contents) + 1)
@@ -108,16 +113,23 @@ interface called `IAdding` and precised in the `IFactoryAdding`.
   ...         obj.__parent__ = self.context
   ...         return obj
 
+
+  >>> verify.verifyClass(IFactoryAdding, Adding)
+  True
   >>> factory = Factory(Fremen)
 
   >>> from cromlech.webob.response import Response
   >>> from cromlech.io.testing import TestRequest
 
   >>> request = TestRequest()
-  >>> addingview = Adding(root, request, factory)
+  >>> adding = Adding(root, request, factory)
+  
+  >>> verify.verifyObject(IFactoryAdding, adding)
+  True
+  
 
 Let's create and register a very basic generic crud
-add form::
+add form, context of the form is our adding component ::
 
   >>> import dolmen.forms.crud as crud
   >>> class AddForm(crud.Add):
@@ -125,12 +137,12 @@ add form::
   ...     '''
   ...     responseFactory = Response
 
-  >>> addform = AddForm(addingview, request)
+  >>> addform = AddForm(adding, request)
   >>> addform
   <dolmen.forms.crud.tests.AddForm object at ...>
 
   >>> naib = Fremen()
-  >>> added_item = addingview.add(naib)
+  >>> added_item = adding.add(naib)
   >>> added_item
   <dolmen.forms.crud.tests.Fremen object at ...>
 
@@ -138,14 +150,6 @@ The created content is correctly located::
 
   >>> added_item.__parent__ is root
   True
-
-As a matter of fact, a IAdding component should always be
-locatable. Conveniently, you can access the location information::
-
-  >>> addingview.__parent__
-  <dolmen.forms.crud.tests.Sietch object at ...>
-  >>> print addingview.__name__
-  None
 
 
 Generic forms
@@ -156,7 +160,7 @@ Create
 
 The add form implementation is tightly tied to the adding view. As the add
 form behavior has been mostly covered above, we'll only test the
-presence of the fields and the label on the form itself::
+presence of the fields and actions on the form itself::
 
   >>> addform.fields.keys()
   ['title', 'water']
@@ -184,7 +188,7 @@ edited::
   ...     'form.field.water': '25',
   ...     'form.field.title': u'Stilgar',
   ...     'form.action.update': u'Update'},
-  ...	  **{'method': 'POST'})
+  ...	  method='POST')
 
   >>> editform = EditForm(naib, post)
   >>> editform
@@ -199,7 +203,7 @@ edited::
   >>> editform.fields.keys()
   ['title', 'water']
 
-The values should now be set::
+As we called updateForm, the values should now be set::
 
   >>> naib.title
   u'Stilgar'
@@ -301,6 +305,8 @@ When confirmed, the form tries to delete the object::
   >>> list(root.keys())
   []
 
+After deletion user is redirected to the parent location::
+
   >>> deleteform.response.status_int
   302
   >>> deleteform.response.headers['Location']
@@ -313,12 +319,12 @@ Form customization
 To customize forms, the usual solution is to subclass them and to work
 with the subclass. `dolmen.forms.crud` proposes a new component to
 customize your forms. Defined by the `IFieldsCustomization` interface,
-it's an adapter that allows you to interact at the field level.
+it's an adapter that can modify the fields collection.
 
 In a `IFieldsCustomization`, the customization happens at the __call__
 level. The forms, while they update the objects fields, query a
 `IFieldsCustomization` adapter and call it, giving the fields as an
-argument.
+argument. It must return the new fields collection.
 
 Let's implement an example::
 
@@ -331,7 +337,6 @@ Let's implement an example::
   ...       """Alters the form fields"""
   ...       return fields.omit('water')
 
-  >>> from zope.interface import verify
   >>> verify.verifyClass(crud.IFieldsCustomization, RemoveWater)
   True
 
@@ -344,11 +349,6 @@ We can now register and test the customization::
   >>> addform = AddForm(adding, request)
   >>> for field in addform.fields: print field
   <TextLineSchemaField Name of the warrior>
-
-One important thing is noticeable here : the 'RemoveWater' adapter was
-registered for the 'Fremen' component. To be able to lookup the
-registery for suitable adapters, the add form uses a special lookup
-function : `dolmen.forms.crud.utils.queryClassMultiAdapter`.
 
 We can test a more complex example, returning a brand new instance of
 Fields::
@@ -367,7 +367,7 @@ Fields::
   True
 
 Checking the fields, we should get *all* the fields defined by the
-Fremen schema::
+Fremen schema (even the title, unlike the default view)::
 
   >>> naib = Fremen(title=u'Paul')
   >>> view = DefaultView(naib, request)
@@ -440,7 +440,7 @@ Field update
 ------------
 
 `dolmen.forms.base` provides the description of a new component that
-can be used to atomize the updating process of an object:
+can be used to propagate the updating process at the field level:
 `IFieldUpdate`. An implementation is available in `dolmen.forms.crud`,
 using an event handler, listening on ObjectModifiedEvent and
 ObjectCreatedEvent::
@@ -453,12 +453,13 @@ ObjectCreatedEvent::
   >>> from grokcore.component import adapts, provides, MultiSubscription
 
   >>> class UpdateTextfield(MultiSubscription):
+  ...     """Logs updates of Title on IDesertWarrior in a list"""
   ...     provides(IFieldUpdate)
   ...     adapts(IDesertWarrior, TextLine)
   ...
   ...     def __init__(self, context, field):
   ...         self.context = context
-  ...         self.field = field    
+  ...         self.field = field
   ...
   ...     def __call__(self):
   ...         updates.append((self.context, self.field))
@@ -467,7 +468,8 @@ ObjectCreatedEvent::
   True
 
 
-Using an add form, the IFieldUpdate adapters should be called during an objects creation::
+Using an add form, the IFieldUpdate adapters should be called during an object
+creation::
 
   >>> request = TestRequest(form={
   ...     'form.field.title': u'Liet',

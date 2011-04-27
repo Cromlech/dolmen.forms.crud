@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from zope.schema import Object
-from zope.location.interfaces import ILocation
 from zope.interface import Interface, Attribute
 from zope.component.interfaces import IFactory
 
 
-class IAdding(ILocation):
+class IAdding(Interface):
     """Defines an abstraction layer for the adding mechanism.
     Historically, the interface was located in the `zope.app.container`.
     """
