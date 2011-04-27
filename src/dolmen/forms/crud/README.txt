@@ -15,7 +15,7 @@ Grokking of the package
 -----------------------
 
   >>> from dolmen.forms.crud import testing
-  >>> testing.grok('dolmen.forms.crud')
+  >>> testing.grok('dolmen.forms.crud.events')
 
 
 Defining some actors

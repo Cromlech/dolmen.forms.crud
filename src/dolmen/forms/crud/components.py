@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import zope.i18n
-import dolmen.content as content
 import grokcore.component as grok
 
 from dolmen.forms.base import Form, DISPLAY
@@ -10,7 +9,6 @@ from dolmen.forms.crud.interfaces import IFactoryAdding
 from dolmen.forms.crud.utils import getFactoryFields, getObjectFields
 
 from dolmen.forms.base import Actions
-from zope.interface import Interface
 from zope.location import ILocation
 from zope.cachedescriptors.property import CachedProperty
 from zope.dublincore.interfaces import IDCDescriptiveProperties

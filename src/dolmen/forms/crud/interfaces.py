@@ -20,7 +20,6 @@ class IAdding(ILocation):
 
 class IFactoryAdding(IAdding):
     """An IFactoryAdding extends an IAdding by adding the notion of Factory.
-    See `dolmen.content.IFactory` definition for more information.
     """
     factory = Object(
         missing_value=None,

@@ -9,12 +9,10 @@ readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
-    'cromlech.webob',
-    'dolmen.content >= 0.7.1',
-    'dolmen.forms.base',
-    'dolmen.forms.ztk',
+    'dolmen.forms.base >= 2.0a1dev',
+    'dolmen.forms.ztk >= 2.0a1dev',
+    'dolmen.location',
     'grokcore.component',
-    'martian',
     'setuptools',
     'zope.cachedescriptors',
     'zope.component',
@@ -26,18 +24,17 @@ install_requires = [
     'zope.lifecycleevent',
     'zope.location',
     'zope.schema',
-    'zope.security',
     ]
 
 tests_require = [
-    'zope.annotation',
-    'zope.i18n',
-    'dolmen.location',
+    'cromlech.io',
+    'cromlech.webob',
+    'zope.configuration',
     ]
 
 setup(name=name,
       version=version,
-      description="CRUD forms and actions for `dolmen.content`",
+      description="CRUD forms and actions for Dolmen",
       long_description=readme + '\n\n' + history,
       keywords='Dolmen Grok Content Forms',
       author='The Dolmen Team',

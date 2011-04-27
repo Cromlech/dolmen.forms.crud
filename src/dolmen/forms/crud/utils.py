@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from martian.util import isclass
 from dolmen.forms.base import Fields
 from dolmen.forms.crud.interfaces import IFieldsCustomization
 from zope.component import getGlobalSiteManager, queryMultiAdapter
-from zope.interface import implementedBy, providedBy
+from zope.interface import providedBy
 
 
 def lookup_customization(factory, form, request):
@@ -24,6 +23,11 @@ def lookup_customization(factory, form, request):
     return None
 
 
+def getAllFields(obj, *ignore):
+    ifaces = tuple(providedBy(obj))
+    return Fields(*ifaces).omit(*ignore)
+
+
 def getFactoryFields(form, factory, *ignore):
     ifaces = factory.getInterfaces()
     if ifaces:
@@ -35,11 +39,6 @@ def getFactoryFields(form, factory, *ignore):
     return Fields()
 
 
-def getAllFields(obj, *ignore):
-    ifaces = tuple(providedBy(obj))
-    return Fields(*ifaces).omit(*ignore)
-
-
 def getObjectFields(form, obj, *ignore):
     fields = getAllFields(obj, *ignore)
     modifier = queryMultiAdapter(
@@ -47,5 +46,3 @@ def getObjectFields(form, obj, *ignore):
     if modifier is not None:
         return modifier(fields)
     return fields
-
-
