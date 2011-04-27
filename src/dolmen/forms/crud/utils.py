@@ -15,7 +15,7 @@ def lookup_customization(factory, form, request):
 
     adapts = (form, request)
     required = factory.getInterfaces()
-    
+
     lookfor = (required,) + tuple(providedBy(a) for a in adapts)
     adapter = sm.adapters.lookup(lookfor, IFieldsCustomization, '')
     if adapter is not None:

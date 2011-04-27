@@ -4,6 +4,7 @@ import doctest
 import unittest
 from zope.component.eventtesting import setUp
 
+
 def test_suite():
     suite = unittest.TestSuite()
     readme = doctest.DocFileSuite(
