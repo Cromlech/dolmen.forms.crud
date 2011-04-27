@@ -1,44 +1,51 @@
 # -*- coding: utf-8 -*-
 
 from martian.util import isclass
-from dolmen.content import get_schema
 from dolmen.forms.base import Fields
 from dolmen.forms.crud.interfaces import IFieldsCustomization
 from zope.component import getGlobalSiteManager, queryMultiAdapter
 from zope.interface import implementedBy, providedBy
 
 
-def queryClassMultiAdapter(adapts, interface, factory_cls=None, name=u''):
+def lookup_customization(factory, form, request):
     """This function searches the component registry for any adapter
     registered for an instance of the given class. It lookups and returns
     it correctly factored.
     """
     sm = getGlobalSiteManager()
-    klass = adapts[0]
 
-    if factory_cls is None:
-        factory_cls = klass
-
-    required = implementedBy(klass)
-    lookfor = (required,) + tuple(providedBy(a) for a in adapts[1:])
-    factory = sm.adapters.lookup(lookfor, interface, name)
-    if factory is not None:
-        return factory(factory_cls, *adapts[1:])
+    adapts = (form, request)
+    required = factory.getInterfaces()
+    
+    lookfor = (required,) + tuple(providedBy(a) for a in adapts)
+    adapter = sm.adapters.lookup(lookfor, IFieldsCustomization, '')
+    if adapter is not None:
+        return adapter(factory, *adapts)
     return None
 
 
-def getSchemaFields(form, component, *ignore):
-    if isclass(component):
-        lookup = queryClassMultiAdapter
-    else:
-        lookup = queryMultiAdapter
-
-    ifaces = get_schema(component)
+def getFactoryFields(form, factory, *ignore):
+    ifaces = factory.getInterfaces()
     if ifaces:
         fields = Fields(*ifaces).omit(*ignore)
-        modifier = lookup((component, form, form.request),
-                          IFieldsCustomization)
+        modifier = lookup_customization(factory, form, form.request)
         if modifier is not None:
             return modifier(fields)
         return fields
     return Fields()
+
+
+def getAllFields(obj, *ignore):
+    ifaces = tuple(providedBy(obj))
+    return Fields(*ifaces).omit(*ignore)
+
+
+def getObjectFields(form, obj, *ignore):
+    fields = getAllFields(obj, *ignore)
+    modifier = queryMultiAdapter(
+        (obj, form, form.request), IFieldsCustomization)
+    if modifier is not None:
+        return modifier(fields)
+    return fields
+
+

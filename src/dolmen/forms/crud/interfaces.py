@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import dolmen.content
 from zope.schema import Object
 from zope.location.interfaces import ILocation
 from zope.interface import Interface, Attribute
+from zope.component.interfaces import IFactory
 
 
 class IAdding(ILocation):
@@ -13,6 +13,10 @@ class IAdding(ILocation):
     context = Attribute("The context of the adding object")
     request = Attribute("The HTTP request")
 
+    def add(component):
+        """Adds the component in the context.
+        """
+
 
 class IFactoryAdding(IAdding):
     """An IFactoryAdding extends an IAdding by adding the notion of Factory.
@@ -21,7 +25,7 @@ class IFactoryAdding(IAdding):
     factory = Object(
         missing_value=None,
         title=u"The factory generating the content.",
-        schema=dolmen.content.IFactory)
+        schema=IFactory)
 
 
 class IFieldsCustomization(Interface):

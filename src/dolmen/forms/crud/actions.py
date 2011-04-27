@@ -15,11 +15,6 @@ def message(message):
     pass
 
 
-def redirect(url):
-    # This needs to be implemented
-    pass
-
-
 class AddAction(Action):
     """Add action for an IAdding context.
     """
@@ -40,8 +35,7 @@ class AddAction(Action):
         form.context.add(obj)
 
         message(_(u"Content created"))
-        redirect(get_absolute_url(obj, form.request))
-
+        form.response.redirect(get_absolute_url(obj, form.request))
         return SUCCESS
 
 
@@ -57,8 +51,7 @@ class UpdateAction(Action):
 
         apply_data_event(form.fields, form.getContentData(), data)
         message(_(u"Content updated"))
-        redirect(get_absolute_url(obj, form.request))
-
+        form.response.redirect(get_absolute_url(form.context, form.request))
         return SUCCESS
 
 
@@ -78,12 +71,13 @@ class DeleteAction(Action):
                 del container[name]
                 form.status = self.successMessage
                 message(form.status)
-                redirect(get_absolute_url(container, form.request))
+                form.response.redirect(
+                    get_absolute_url(container, form.request))
                 return SUCCESS
             except ValueError:
                 pass
 
         form.status = self.failureMessage
         message(form.status)
-        redirect(get_absolute_url(form.context, form.request))
+        form.response.redirect(get_absolute_url(content, form.request))
         return FAILURE

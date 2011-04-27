@@ -7,9 +7,11 @@ import grokcore.component as grok
 from dolmen.forms.base import Form, DISPLAY
 from dolmen.forms.crud import actions as formactions, i18n as _
 from dolmen.forms.crud.interfaces import IFactoryAdding
-from dolmen.forms.crud.utils import getSchemaFields
+from dolmen.forms.crud.utils import getFactoryFields, getObjectFields
 
 from dolmen.forms.base import Actions
+from zope.interface import Interface
+from zope.location import ILocation
 from zope.cachedescriptors.property import CachedProperty
 from zope.dublincore.interfaces import IDCDescriptiveProperties
 from zope.i18nmessageid import Message
@@ -27,17 +29,19 @@ class Add(Form):
 
     @property
     def label(self):
-        name = self.context.factory.name
-        if isinstance(name, Message):
-            name = zope.i18n.translate(name, context=self.request)
-        return zope.i18n.translate(
-            _(u"add_action", default="Add: $name",
-              mapping={'name': name}), context=self.request)
+        name = getattr(self.context.factory, 'name', None)
+        if name is not None:
+            if isinstance(name, Message):
+                name = zope.i18n.translate(name, context=self.request)
+            return zope.i18n.translate(
+                _(u"add_action", default="Add: $name",
+                  mapping={'name': name}), context=self.request)
+        return 'Add'
 
     @CachedProperty
     def fields(self):
-        return getSchemaFields(
-            self, self.context.factory.factory, '__parent__')
+        return getFactoryFields(
+            self, self.context.factory, '__parent__', '__name__')
 
     @CachedProperty
     def actions(self):
@@ -49,7 +53,7 @@ class Edit(Form):
     grok.baseclass()
     grok.name('edit')
     grok.title(_(u"Edit"))
-    grok.context(content.IContent)
+    grok.context(ILocation)
 
     ignoreContent = False
     ignoreRequest = False
@@ -64,15 +68,15 @@ class Edit(Form):
 
     @CachedProperty
     def fields(self):
-        return getSchemaFields(
-            self, self.getContentData().getContent(),
-            '__parent__')
+        edited = self.getContentData().getContent()
+        return getObjectFields(
+            self, edited, '__parent__', '__name__')
 
 
 class Display(Form):
     grok.baseclass()
     grok.title(_(u"View"))
-    grok.context(content.IContent)
+    grok.context(ILocation)
 
     mode = DISPLAY
     ignoreRequest = True
@@ -87,9 +91,9 @@ class Display(Form):
 
     @CachedProperty
     def fields(self):
-        return getSchemaFields(
-            self, self.getContentData().getContent(),
-            '__parent__', 'title')
+        displayed = self.getContentData().getContent()
+        return getObjectFields(
+            self, displayed, '__parent__', '__name__', 'title')
 
 
 class Delete(Form):
@@ -97,7 +101,7 @@ class Delete(Form):
     """
     grok.baseclass()
     grok.title(_(u"Delete"))
-    grok.context(content.IContent)
+    grok.context(ILocation)
 
     label = _(u"Delete")
     description = _(u"Are you really sure ?")
