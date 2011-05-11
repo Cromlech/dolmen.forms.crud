@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 name = 'dolmen.forms.crud'
 version = '2.0a1'
-readme = open('README.txt').read()
+readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
