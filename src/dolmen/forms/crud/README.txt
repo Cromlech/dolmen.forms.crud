@@ -129,7 +129,7 @@ interface called `IAdding` and precised in the `IFactoryAdding`.
   
 
 Let's create and register a very basic generic crud
-add form, context of the form is our adding component ::
+add form, context of the form is our adding component:
 
   >>> import dolmen.forms.crud as crud
   >>> class AddForm(crud.Add):
