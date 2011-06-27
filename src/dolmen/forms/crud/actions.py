@@ -5,14 +5,24 @@ from dolmen.forms.base import Action
 from dolmen.forms.base.markers import SUCCESS, FAILURE
 from dolmen.forms.base.utils import set_fields_data, apply_data_event
 from dolmen.forms.crud import i18n as _
-from dolmen.forms.ztk.actions import CancelAction  # Convenience import
 from zope.event import notify
 from zope.lifecycleevent import ObjectCreatedEvent
+from zope.location import ILocation
 
 
 def message(message):
     # This needs to be implemented
     pass
+
+
+class CancelAction(Action):
+    """Cancel the current form and return on the default content view.
+    """
+
+    def __call__(self, form):
+        content = form.getContentData().getContent()
+        form.response.redirect(get_absolute_url(content, form.request))
+        return SUCCESS
 
 
 class AddAction(Action):
@@ -61,21 +71,30 @@ class DeleteAction(Action):
     successMessage = _(u"The object has been deleted.")
     failureMessage = _(u"This object could not be deleted.")
 
+    def available(self, form):
+        content = form.getContentData().getContent()
+        if ILocation.providedBy(content):
+            container = content.__parent__
+            return (hasattr(container, '__delitem__') and
+                    hasattr(container, '__contains__'))
+        return False
+
     def __call__(self, form):
         content = form.getContentData().getContent()
-        container = content.__parent__
-        name = content.__name__
 
-        if name in container:
-            try:
-                del container[name]
-                form.status = self.successMessage
-                message(form.status)
-                form.response.redirect(
-                    get_absolute_url(container, form.request))
-                return SUCCESS
-            except ValueError:
-                pass
+        if ILocation.providedBy(content):
+            container = content.__parent__
+            name = content.__name__
+            if name in container:
+                try:
+                    del container[name]
+                    form.status = self.successMessage
+                    message(form.status)
+                    form.response.redirect(
+                        get_absolute_url(container, form.request))
+                    return SUCCESS
+                except ValueError:
+                    pass
 
         form.status = self.failureMessage
         message(form.status)
