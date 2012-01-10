@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0b1 (2010-01-10)
+2.0b1 (2012-01-10)
 ------------------
 
 * Redirections are now exceptions and raised accordingly. Please see
