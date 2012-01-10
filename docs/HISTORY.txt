@@ -1,6 +1,13 @@
 Changelog
 =========
 
+2.0b2 (2012-01-10)
+------------------
+
+* Implemented the `message` function using the package ``dolmen.message``.
+  This provides a default behavior but introduces no new dependencies.
+
+
 2.0b1 (2012-01-10)
 ------------------
 
