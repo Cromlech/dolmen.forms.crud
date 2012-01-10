@@ -118,10 +118,9 @@ interface called `IAdding` and precised in the `IFactoryAdding`.
   True
   >>> factory = Factory(Fremen)
 
-  >>> from cromlech.webob.response import Response
-  >>> from cromlech.io.testing import TestRequest
+  >>> from cromlech.browser.testing import TestHTTPRequest, TestHTTPResponse
 
-  >>> request = TestRequest()
+  >>> request = TestHTTPRequest()
   >>> adding = Adding(root, request, factory)
   
   >>> verify.verifyObject(IFactoryAdding, adding)
@@ -135,7 +134,7 @@ add form, context of the form is our adding component:
   >>> class AddForm(crud.Add):
   ...     '''Generic add form.
   ...     '''
-  ...     responseFactory = Response
+  ...     responseFactory = TestHTTPResponse
 
   >>> addform = AddForm(adding, request)
   >>> addform
@@ -179,12 +178,12 @@ An edit form can be registered simply by sublassing the Edit base class::
   >>> class EditForm(crud.Edit):
   ...     '''Generic edit form.
   ...     '''
-  ...     responseFactory = Response
+  ...     responseFactory = TestHTTPResponse
 
 This form registered, we can check if all the fields are ready to be
 edited::
 
-  >>> post = TestRequest(form={
+  >>> post = TestHTTPRequest(form={
   ...     'form.field.water': '25',
   ...     'form.field.title': u'Stilgar',
   ...     'form.action.update': u'Update'},
@@ -196,9 +195,9 @@ edited::
 
   >>> editform.update()
   >>> editform.updateForm()
-  >>> for action in editform.actions: print action
-  <UpdateAction Update>
-  <CancelAction Cancel>
+  Traceback (most recent call last):
+  ...  
+  HTTPFound
 
   >>> editform.fields.keys()
   ['title', 'water']
@@ -219,7 +218,7 @@ A special kind of form allows you display your content::
   >>> class DefaultView(crud.Display):
   ...     '''Generic display form.
   ...     '''
-  ...     responseFactory = Response
+  ...     responseFactory = TestHTTPResponse
   
   >>> view = DefaultView(naib, request)
   >>> view
@@ -270,7 +269,7 @@ A delete form is a simple form with no fields, that only provides a
   >>> class DeleteForm(crud.Delete):
   ...     '''Generic delete form.
   ...     '''
-  ...     responseFactory = Response
+  ...     responseFactory = TestHTTPResponse
 
   >>> deleteform = DeleteForm(naib, request)
   >>> deleteform
@@ -286,7 +285,7 @@ A delete form is a simple form with no fields, that only provides a
 
 When confirmed, the form tries to delete the object::
 
-  >>> post = TestRequest(form={
+  >>> post = TestHTTPRequest(form={
   ...     'form.action.delete': u'Delete'},
   ...	  method='POST',
   ...     )
@@ -297,20 +296,16 @@ When confirmed, the form tries to delete the object::
   >>> deleteform = DeleteForm(naib, post)
   >>> deleteform.update()
   >>> deleteform.updateForm()
-  
+  Traceback (most recent call last):
+  ...  
+  HTTPFound
+
   >>> from zope.i18n import translate
   >>> translate(deleteform.status, context=post)
   u'The object has been deleted.'
 
   >>> list(root.keys())
   []
-
-After deletion user is redirected to the parent location::
-
-  >>> deleteform.response.status_int
-  302
-  >>> deleteform.response.headers['Location']
-  'http://localhost'
   
 
 Form customization
@@ -403,7 +398,7 @@ Let's have the same introspection check with the edit form::
 
 We provide data for the update::
 
-  >>> request = TestRequest(form={
+  >>> request = TestHTTPRequest(form={
   ...     'form.field.water': '10',
   ...     'form.field.title': u'Sihaya',
   ...     'form.action.update': u'Update'},
@@ -417,6 +412,9 @@ We provide data for the update::
   >>> editform = EditForm(chani, request)
   >>> editform.update()
   >>> editform.updateForm()
+  Traceback (most recent call last):
+  ...  
+  HTTPFound
 
 We check the trigged events::
 
@@ -471,7 +469,7 @@ ObjectCreatedEvent::
 Using an add form, the IFieldUpdate adapters should be called during an object
 creation::
 
-  >>> request = TestRequest(form={
+  >>> request = TestHTTPRequest(form={
   ...     'form.field.title': u'Liet',
   ...     'form.action.add': u'Add'},
   ...	  method='POST',
@@ -485,6 +483,9 @@ creation::
   >>> addform = AddForm(adding, request)
   >>> addform.update()
   >>> addform.updateForm()
+  Traceback (most recent call last):
+  ...  
+  HTTPFound
 
   >>> kynes = tabr['1']
   >>> kynes
@@ -501,7 +502,7 @@ We can do the same thing for the edit form::
 
   >>> updates = []
 
-  >>> request = TestRequest(form={
+  >>> request = TestHTTPRequest(form={
   ...     'form.field.water': '50',
   ...     'form.field.title': u'Imperial weather specialist',
   ...     'form.action.update': u'Update'},
@@ -511,6 +512,9 @@ We can do the same thing for the edit form::
   >>> editform = EditForm(kynes, request)
   >>> editform.update()
   >>> editform.updateForm()
+  Traceback (most recent call last):
+  ...  
+  HTTPFound
 
   >> kynes.title
   u'Imperial weather specialist'
@@ -524,7 +528,7 @@ anything::
 
  >>> updates = []
 
-  >>> request = TestRequest(form={
+  >>> request = TestHTTPRequest(form={
   ...     'form.field.water': '40',
   ...     'form.action.update': u'Update'},
   ...	  method='POST',

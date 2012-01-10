@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from cromlech.browser.exceptions import HTTPFound, HTTPNotModified
 from dolmen.location import get_absolute_url
 from dolmen.forms.base import Action
-from dolmen.forms.base.markers import SUCCESS, FAILURE
+from dolmen.forms.base.markers import FAILURE
 from dolmen.forms.base.utils import set_fields_data, apply_data_event
 from dolmen.forms.crud import i18n as _
 from zope.event import notify
@@ -21,8 +22,8 @@ class CancelAction(Action):
 
     def __call__(self, form):
         content = form.getContentData().getContent()
-        form.response.redirect(get_absolute_url(content, form.request))
-        return SUCCESS
+        url = get_absolute_url(content, form.request)
+        raise HTTPNotModified(url)
 
 
 class AddAction(Action):
@@ -45,8 +46,8 @@ class AddAction(Action):
         form.context.add(obj)
 
         message(_(u"Content created"))
-        form.response.redirect(get_absolute_url(obj, form.request))
-        return SUCCESS
+        url = get_absolute_url(obj, form.request)
+        raise HTTPFound(url)
 
 
 class UpdateAction(Action):
@@ -61,8 +62,8 @@ class UpdateAction(Action):
 
         apply_data_event(form.fields, form.getContentData(), data)
         message(_(u"Content updated"))
-        form.response.redirect(get_absolute_url(form.context, form.request))
-        return SUCCESS
+        url = get_absolute_url(form.context, form.request)
+        raise HTTPFound(url)
 
 
 class DeleteAction(Action):
@@ -90,13 +91,11 @@ class DeleteAction(Action):
                     del container[name]
                     form.status = self.successMessage
                     message(form.status)
-                    form.response.redirect(
-                        get_absolute_url(container, form.request))
-                    return SUCCESS
+                    url = get_absolute_url(content, form.request)
+                    raise HTTPFound(url)
                 except ValueError:
                     pass
 
         form.status = self.failureMessage
         message(form.status)
-        form.response.redirect(get_absolute_url(content, form.request))
-        return FAILURE
+        return Failure
