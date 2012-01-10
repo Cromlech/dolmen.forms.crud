@@ -13,6 +13,7 @@ install_requires = [
     'dolmen.forms.base >= 2.0b2',
     'dolmen.forms.ztk >= 2.0b1',
     'dolmen.location',
+    'dolmen.message',
     'grokcore.component',
     'setuptools',
     'zope.cachedescriptors',

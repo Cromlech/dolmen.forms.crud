@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 
 from cromlech.browser.exceptions import HTTPFound, HTTPNotModified
-from dolmen.location import get_absolute_url
 from dolmen.forms.base import Action
 from dolmen.forms.base.markers import FAILURE
 from dolmen.forms.base.utils import set_fields_data, apply_data_event
 from dolmen.forms.crud import i18n as _
+from dolmen.location import get_absolute_url
+from dolmen.message.utils import send
+
 from zope.event import notify
 from zope.lifecycleevent import ObjectCreatedEvent
 from zope.location import ILocation
 
 
 def message(message):
-    # This needs to be implemented
-    pass
+    send(message)
 
 
 class CancelAction(Action):
