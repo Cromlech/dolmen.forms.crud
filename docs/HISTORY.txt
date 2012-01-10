@@ -1,10 +1,20 @@
 Changelog
 =========
 
+2.0b1 (2010-01-10)
+------------------
+
+* Redirections are now exceptions and raised accordingly. Please see
+  ``cromlech.browser`` for more informations.
+
+* Using now the latest `Cromlech` packages.
+
+
 2.0a2 (2011-06-27)
 ------------------
 
 * `Cancel` action now uses ``dolmen.location``.
+
 * `Delete` action is now only available to item with parents
   that allow deletion.
 
