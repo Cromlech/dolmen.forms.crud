@@ -99,4 +99,4 @@ class DeleteAction(Action):
 
         form.status = self.failureMessage
         message(form.status)
-        return Failure
+        return FAILURE

@@ -1,6 +1,14 @@
 Changelog
 =========
 
+2.0 (2012-01-18)
+----------------
+
+* Fixed a typo in the `actions` module that caused a bug in case of failure.
+
+* Updated to use the latest changes in the ``dolmen.forms`` stack.
+
+
 2.0b2 (2012-01-10)
 ------------------
 
