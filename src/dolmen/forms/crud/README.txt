@@ -245,13 +245,12 @@ page::
     </head>
     <body>
       <form action="http://localhost/1/" 
-            method="post"
-            enctype="multipart/form-data" id="form">
+            enctype="multipart/form-data" id="form" method="post">
         <h1>1</h1>
         <div class="fields">
           <div class="field">
             <label class="field-label" for="form-field-water">Number water gallons owned</label>
-            <span class="field-required">(required)</span>
+            <span class="field-required" >(required)</span>
             <br />
             25
           </div>
@@ -299,6 +298,9 @@ When confirmed, the form tries to delete the object::
   Traceback (most recent call last):
   ...  
   HTTPFound
+  >>> import sys
+  >>> sys.exc_info()[1].location
+  'http://localhost'
 
   >>> from zope.i18n import translate
   >>> translate(deleteform.status, context=post)

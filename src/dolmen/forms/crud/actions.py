@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from cromlech.browser.exceptions import HTTPFound, HTTPNotModified
+from cromlech.browser.exceptions import HTTPFound
 from dolmen.forms.base import Action
 from dolmen.forms.base.markers import FAILURE
 from dolmen.forms.base.utils import set_fields_data, apply_data_event
@@ -24,7 +24,7 @@ class CancelAction(Action):
     def __call__(self, form):
         content = form.getContentData().getContent()
         url = get_absolute_url(content, form.request)
-        raise HTTPNotModified(url)
+        raise HTTPFound(url)
 
 
 class AddAction(Action):
@@ -92,7 +92,7 @@ class DeleteAction(Action):
                     del container[name]
                     form.status = self.successMessage
                     message(form.status)
-                    url = get_absolute_url(content, form.request)
+                    url = get_absolute_url(container, form.request)
                     raise HTTPFound(url)
                 except ValueError:
                     pass
