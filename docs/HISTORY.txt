@@ -1,12 +1,19 @@
 Changelog
 =========
 
+2.2 (2012-02-02)
+----------------
+
+* enhanced titles on forms, using element title if possible
+
+
 2.1 (2012-01-25)
 ----------------
 
 * Fixed a typo in DeleteAction, redirection to container not component !
 
 * Fixed CancelAction redirect to HTTPFound
+
 
 2.0 (2012-01-18)
 ----------------

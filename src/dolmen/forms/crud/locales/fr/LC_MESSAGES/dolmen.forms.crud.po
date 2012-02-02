@@ -25,7 +25,7 @@ msgid "Edit"
 msgstr "Editer"
 
 msgid "edit_action"
-msgstr "Editer: ${name}"
+msgstr "Editer : ${name}"
 
 msgid "Update"
 msgstr "Appliquer les modifications"
@@ -35,6 +35,9 @@ msgstr "Voir"
 
 msgid "Delete"
 msgstr "Supprimer"
+
+msgid "delete_action"
+msgstr "Supprimer : ${name}"
 
 msgid "Cancel"
 msgstr "Annuler"
