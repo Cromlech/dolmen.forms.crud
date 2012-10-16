@@ -4,7 +4,7 @@ from martian.util import isclass
 from dolmen.content import get_schema
 from dolmen.forms.crud.interfaces import IFieldsCustomization
 from zeam.form.base import Fields
-from zope.component import getGlobalSiteManager, queryMultiAdapter
+from zope.component import getSiteManager, queryMultiAdapter
 from zope.interface import implementedBy, providedBy
 
 
@@ -13,7 +13,7 @@ def queryClassMultiAdapter(adapts, interface, factory_cls=None, name=u''):
     registered for an instance of the given class. It lookups and returns
     it correctly factored.
     """
-    sm = getGlobalSiteManager()
+    sm = getSiteManager()
     klass = adapts[0]
 
     if factory_cls is None:

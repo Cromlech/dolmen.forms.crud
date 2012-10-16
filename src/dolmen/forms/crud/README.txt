@@ -389,14 +389,14 @@ Let's implement an example::
 
 We can now register and test the customization::
 
-  >>> grokcore.component.testing.grok_component('custom', RemoveWater)
+  >>> grokcore.component.testing.grok_component('removewater', RemoveWater)
   True
 
   >>> security.newInteraction(Participation(manager))
 
   >>> addform = addingview.traverse('fremen', [])
   >>> for field in addform.fields: print field
-  <TextLineSchemaField Name of the warrior>
+  <TextLineField Name of the warrior>
 
 One important thing is noticeable here : the 'RemoveWater' adapter was
 registered for the 'Fremen' component. To be able to lookup the
