@@ -153,7 +153,7 @@ will auto-generate forms based on `dolmen.content` schemas.
 more info). Therefore, we need to register a basic layout in order to
 render our forms::
 
-  >>> from megrok.layout import Layout
+  >>> from grokcore.layout import Layout
   >>> from zope.interface import Interface
 
   >>> class GenericLayout(Layout):
