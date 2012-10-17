@@ -281,12 +281,14 @@ we can see, the title attribute is used as the HTML header (h1) of the
 page::
 
   >>> print view()
-  <form action="http://127.0.0.1" method="post" enctype="multipart/form-data">
+  <form action="http://127.0.0.1" method="post"
+        enctype="multipart/form-data">
     <h1>Stilgar</h1>
     <div class="fields">
       <div class="field">
-        <label class="field-label" for="form-field-water">Number water gallons owned</label>
-        <span class="field-required">(required)</span>
+          <label class="field-label" for="form-field-water">Number water gallons owned</label>
+          <span class="field-required">(required)</span>
+          <br />
         25
       </div>
     </div>

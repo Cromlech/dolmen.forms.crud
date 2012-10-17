@@ -19,9 +19,10 @@ def notify_fields_creation(ob, event):
         fields = Fields(*ifaces)
 
         for field_repr in fields:
-            field = field_repr._field
-            if field.get(ob) != field.missing_value:
-                handlers = getAdapters((ob, field), IFieldUpdate)
+            field = field_repr
+            field_interface = field.interface.get(field.identifier)
+            if getattr(ob, field.identifier, None) != field_interface.missing_value:
+                handlers = getAdapters((ob, field_interface), IFieldUpdate)
                 for handler in handlers:
                     # Iteration through the generator
                     pass
