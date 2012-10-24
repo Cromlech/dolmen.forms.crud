@@ -1,6 +1,13 @@
 Changelog
 =========
 
+1.0 (2012-10-24)
+----------------
+
+* Fixed the dependencies and the testing, echoing the changes in the related
+  packages.
+
+
 1.0b5 (2011-02-16)
 ------------------
 
