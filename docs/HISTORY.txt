@@ -1,6 +1,13 @@
 Changelog
 =========
 
+2.2.2 (2012-11-28)
+------------------
+
+* The actions now uses the `SuccessMarker` instead of raising a raw error,
+  to trigger a redirection.
+
+
 2.2.1 (2012-11-16)
 ------------------
 
