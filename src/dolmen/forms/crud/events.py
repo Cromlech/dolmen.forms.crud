@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import grokcore.component as grok
+from crom import sources
 from dolmen.forms.base import IFieldUpdate
 from dolmen.forms.crud import utils
 from zope.interface import Interface
-from zope.lifecycleevent import IObjectModifiedEvent, IObjectCreatedEvent
+from cromlech.events import IObjectModifiedEvent, IObjectCreatedEvent
 
 
-@grok.subscribe(Interface, IObjectCreatedEvent)
+@sources(Interface, IObjectCreatedEvent)
 def notify_fields_creation(ob, event):
     """This handler propagates the ObjectCreatedEvent to a more atomic
     level, by calling an adapter on each field of the schema. This permits
@@ -24,7 +24,7 @@ def notify_fields_creation(ob, event):
                 handler()
 
 
-@grok.subscribe(Interface, IObjectModifiedEvent)
+@sources(Interface, IObjectModifiedEvent)
 def notify_fields_update(ob, event):
     """This handler propagates the ObjectModifiedEvent to a more atomic
     level, by calling an adapter on each modified field. This permits to

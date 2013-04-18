@@ -2,7 +2,6 @@
 
 from dolmen.forms.base import Fields
 from dolmen.forms.crud.interfaces import IFieldsCustomization
-from zope.component import getGlobalSiteManager, queryMultiAdapter
 from zope.interface import providedBy
 
 
@@ -41,8 +40,7 @@ def getFactoryFields(form, factory, *ignore):
 
 def getObjectFields(form, obj, *ignore):
     fields = getAllFields(obj, *ignore)
-    modifier = queryMultiAdapter(
-        (obj, form, form.request), IFieldsCustomization)
+    modifier = IFieldsCustomization(obj, form, form.request)
     if modifier is not None:
         return modifier(fields)
     return fields

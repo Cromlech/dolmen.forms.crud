@@ -1,27 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import zope.i18n
-import grokcore.component as grok
-
 from dolmen.forms.base import Form, DISPLAY
 from dolmen.forms.crud import actions as formactions, i18n as _
 from dolmen.forms.crud.interfaces import IFactoryAdding
 from dolmen.forms.crud.utils import getFactoryFields, getObjectFields
+from cromlech.i18n import translate
 
 from dolmen.forms.base import Actions
 from zope.location import ILocation
 from zope.cachedescriptors.property import CachedProperty
-from zope.dublincore.interfaces import IDCDescriptiveProperties
 from zope.i18nmessageid import Message
 
 
-def dc_title_or_name(obj):
-    """get title of obj or get its name"""
-    dc = IDCDescriptiveProperties(obj, None)
-    if dc is not None and dc.title:
-        return dc.title
-    else:
-        return getattr(obj, '__name__', '')
+def title_or_name(obj):
+    title = getattr(obj, 'title', None)
+    if title is not None:
+        return title
+    return getattr(obj, '__name__', None)
 
 
 class Add(Form):
@@ -29,11 +24,6 @@ class Add(Form):
     'update'. It checks if the 'require' directive of the factored item
     is respected on the context.
     """
-    grok.baseclass()
-    grok.title(_(u"Add"))
-    grok.name('dolmen.add')
-    grok.context(IFactoryAdding)
-
     @property
     def label(self):
         name = getattr(self.context.factory, 'name', None)
@@ -57,11 +47,8 @@ class Add(Form):
 
 
 class Edit(Form):
-    grok.baseclass()
-    grok.name('edit')
-    grok.title(_(u"Edit"))
-    grok.context(ILocation)
-
+    """
+    """
     ignoreContent = False
     ignoreRequest = False
     actions = Actions(formactions.UpdateAction(_("Update")),
@@ -70,7 +57,7 @@ class Edit(Form):
     @property
     def label(self):
         label = _(u"edit_action", default=u"Edit: $name",
-                  mapping={"name": dc_title_or_name(self.context)})
+                  mapping={"name": title_or_name(self.context)})
         return zope.i18n.translate(label, context=self.request)
 
     @CachedProperty
@@ -81,17 +68,15 @@ class Edit(Form):
 
 
 class Display(Form):
-    grok.baseclass()
-    grok.title(_(u"View"))
-    grok.context(ILocation)
-
+    """
+    """
     mode = DISPLAY
     ignoreRequest = True
     ignoreContent = False
 
     @property
     def label(self):
-        return dc_title_or_name(self.context)
+        return title_or_name(self.context)
 
     @CachedProperty
     def fields(self):
@@ -103,10 +88,6 @@ class Display(Form):
 class Delete(Form):
     """A confirmation for to delete an object.
     """
-    grok.baseclass()
-    grok.title(_(u"Delete"))
-    grok.context(ILocation)
-
     description = _(u"Are you really sure ?")
     actions = Actions(formactions.DeleteAction(_("Delete")),
                       formactions.CancelAction(_("Cancel")))
@@ -114,5 +95,5 @@ class Delete(Form):
     @property
     def label(self):
         label = _(u"delete_action", default=u"Delete: $name",
-                  mapping={"name": dc_title_or_name(self.context)})
+                  mapping={"name": title_or_name(self.context)})
         return zope.i18n.translate(label, context=self.request)
