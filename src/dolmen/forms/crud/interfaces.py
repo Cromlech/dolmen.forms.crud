@@ -2,7 +2,7 @@
 
 from zope.schema import Object
 from zope.interface import Interface, Attribute
-from zope.component.interfaces import IFactory
+from cromlech.content import IFactory
 
 
 class IAdding(Interface):
@@ -24,17 +24,3 @@ class IFactoryAdding(IAdding):
         missing_value=None,
         title=u"The factory generating the content.",
         schema=IFactory)
-
-
-class IFieldsCustomization(Interface):
-    """Defines a form customization. A form customization is an adapter
-    that allows to modify the fields of a form and their rendering.
-    """
-    context = Attribute("The context of the customized form")
-    request = Attribute("The HTTP request")
-    form = Attribute("The form object")
-
-    def __call__(fields):
-        """Must returns an instance of z3c.form.Fields or a modified
-        versions of the original fields arg.
-        """

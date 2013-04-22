@@ -2,12 +2,10 @@
 
 from dolmen.forms.base import Form, DISPLAY
 from dolmen.forms.crud import actions as formactions, i18n as _
-from dolmen.forms.crud.interfaces import IFactoryAdding
-from dolmen.forms.crud.utils import getFactoryFields, getObjectFields
+from dolmen.forms.crud.utils import getFactoryFields, getAllFields
 from cromlech.i18n import translate
 
 from dolmen.forms.base import Actions
-from zope.location import ILocation
 from zope.cachedescriptors.property import CachedProperty
 from zope.i18nmessageid import Message
 
@@ -29,8 +27,8 @@ class Add(Form):
         name = getattr(self.context.factory, 'name', None)
         if name is not None:
             if isinstance(name, Message):
-                name = zope.i18n.translate(name, context=self.request)
-            return zope.i18n.translate(
+                name = translate(name, context=self.request)
+            return translate(
                 _(u"add_action", default="Add: $name",
                   mapping={'name': name}), context=self.request)
         return 'Add'
@@ -58,13 +56,12 @@ class Edit(Form):
     def label(self):
         label = _(u"edit_action", default=u"Edit: $name",
                   mapping={"name": title_or_name(self.context)})
-        return zope.i18n.translate(label, context=self.request)
+        return translate(label, context=self.request)
 
     @CachedProperty
     def fields(self):
         edited = self.getContentData().getContent()
-        return getObjectFields(
-            self, edited, '__parent__', '__name__')
+        return getAllFields(edited, '__parent__', '__name__')
 
 
 class Display(Form):
@@ -81,8 +78,7 @@ class Display(Form):
     @CachedProperty
     def fields(self):
         displayed = self.getContentData().getContent()
-        return getObjectFields(
-            self, displayed, '__parent__', '__name__', 'title')
+        return getAllFields(displayed, '__parent__', '__name__', 'title')
 
 
 class Delete(Form):
@@ -96,4 +92,4 @@ class Delete(Form):
     def label(self):
         label = _(u"delete_action", default=u"Delete: $name",
                   mapping={"name": title_or_name(self.context)})
-        return zope.i18n.translate(label, context=self.request)
+        return translate(label, context=self.request)

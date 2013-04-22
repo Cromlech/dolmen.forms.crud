@@ -1,6 +1,14 @@
 # This is the repository-wide ignore file. Suffixes below are ignored
 # i.e. committing not allowed.
 
+.installed.cfg
+.mr.developer.cfg
+bin/
+checkouts/
+develop-eggs/
+parts/
+
+
 # archives
 *.tar
 *.tar.gz

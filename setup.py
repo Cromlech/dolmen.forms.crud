@@ -10,6 +10,7 @@ history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
     'cromlech.browser >= 0.5',
+    'cromlech.content',
     'dolmen.forms.base >= 2.0',
     'dolmen.forms.ztk >= 2.0',
     'dolmen.location',
@@ -17,7 +18,6 @@ install_requires = [
     'setuptools',
     'zope.cachedescriptors',
     'zope.event',
-    'zope.i18nmessageid',
     'zope.interface',
     'zope.location',
     'zope.schema',
@@ -25,6 +25,7 @@ install_requires = [
     ]
 
 tests_require = [
+    'crom',
     'cromlech.browser [test]',
     ]
 
