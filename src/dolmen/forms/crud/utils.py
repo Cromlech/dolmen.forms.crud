@@ -14,8 +14,7 @@ def getFactoryFields(form, factory, *ignore):
     if ifaces:
         fields = Fields(*ifaces).omit(*ignore)
         return fields
-    else:
-        return Fields()
+    return Fields()
 
 
 def getObjectFields(form, obj, *ignore):

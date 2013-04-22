@@ -14,7 +14,7 @@ def title_or_name(obj):
     title = getattr(obj, 'title', None)
     if title is not None:
         return title
-    return getattr(obj, '__name__', None)
+    return getattr(obj, '__name__', u'')
 
 
 class Add(Form):
@@ -27,10 +27,10 @@ class Add(Form):
         name = getattr(self.context.factory, 'name', None)
         if name is not None:
             if isinstance(name, Message):
-                name = translate(name, context=self.request)
+                name = translate(name)
             return translate(
                 _(u"add_action", default="Add: $name",
-                  mapping={'name': name}), context=self.request)
+                  mapping={'name': name}))
         return 'Add'
 
     @CachedProperty
@@ -56,7 +56,7 @@ class Edit(Form):
     def label(self):
         label = _(u"edit_action", default=u"Edit: $name",
                   mapping={"name": title_or_name(self.context)})
-        return translate(label, context=self.request)
+        return translate(label)
 
     @CachedProperty
     def fields(self):
@@ -92,4 +92,4 @@ class Delete(Form):
     def label(self):
         label = _(u"delete_action", default=u"Delete: $name",
                   mapping={"name": title_or_name(self.context)})
-        return translate(label, context=self.request)
+        return translate(label)

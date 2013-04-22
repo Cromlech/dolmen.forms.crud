@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from cromlech.browser.exceptions import HTTPFound
+from cromlech.browser import IURL
 from cromlech.events import ObjectCreatedEvent
 
 from dolmen.forms.base import Action, SuccessMarker
 from dolmen.forms.base.markers import FAILURE
 from dolmen.forms.base.utils import set_fields_data, apply_data_event
 from dolmen.forms.crud import i18n as _
-from dolmen.location import get_absolute_url
 from dolmen.message.utils import send
 
 from zope.event import notify
@@ -24,7 +23,7 @@ class CancelAction(Action):
 
     def __call__(self, form):
         content = form.getContentData().getContent()
-        url = get_absolute_url(content, form.request)
+        url = str(IURL(content, form.request))
         return SuccessMarker('Aborted', True, url=url)
 
 
@@ -48,7 +47,7 @@ class AddAction(Action):
         form.context.add(obj)
 
         message(_(u"Content created"))
-        url = get_absolute_url(obj, form.request)
+        url = str(IURL(obj, form.request))
         return SuccessMarker('Added', True, url=url)
 
 
@@ -64,7 +63,7 @@ class UpdateAction(Action):
 
         apply_data_event(form.fields, form.getContentData(), data)
         message(_(u"Content updated"))
-        url = get_absolute_url(form.context, form.request)
+        url = str(IURL(form.context, form.request))
         return SuccessMarker('Updated', True, url=url)
 
 
@@ -93,7 +92,7 @@ class DeleteAction(Action):
                     del container[name]
                     form.status = self.successMessage
                     message(form.status)
-                    url = get_absolute_url(container, form.request)
+                    url = str(IURL(container, form.request))
                     return SuccessMarker('Deleted', True, url=url)
                 except ValueError:
                     pass

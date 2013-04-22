@@ -9,24 +9,25 @@ readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
+    'crom',
     'cromlech.browser >= 0.5',
     'cromlech.content',
+    'cromlech.events',
+    'cromlech.i18n',
     'dolmen.forms.base >= 2.0',
-    'dolmen.forms.ztk >= 2.0',
-    'dolmen.location',
     'dolmen.message',
     'setuptools',
     'zope.cachedescriptors',
     'zope.event',
+    'zope.i18nmessageid',
     'zope.interface',
     'zope.location',
     'zope.schema',
-    'cromlech.i18n',
     ]
 
 tests_require = [
-    'crom',
     'cromlech.browser [test]',
+    'dolmen.forms.ztk >= 2.0',
     ]
 
 setup(name=name,
