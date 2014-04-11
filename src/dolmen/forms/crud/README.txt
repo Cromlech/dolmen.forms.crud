@@ -11,12 +11,6 @@ content. It provides adapters to customize the fields of a form.
 Setting up the components
 =========================
 
-Grokking of the package
------------------------
-
-  >>> from dolmen.forms.crud import testing
-  >>> testing.grok('dolmen.forms.crud.events')
-
 
 Defining some actors
 --------------------
@@ -239,9 +233,10 @@ A display form has no actions::
 we can see, the title attribute is used as the HTML header (h1) of the
 page::
 
-  >>> print view() # doctest:+NORMALIZE_WHITESPACE
+  >>> print str(view())  #doctest: +NORMALIZE_WHITESPACE
   <html>
     <head>
+      <title>1</title>
     </head>
     <body>
       <form action="http://localhost/1/"
@@ -251,7 +246,7 @@ page::
         <div class="fields">
           <div class="field">
             <label class="field-label" for="form-field-water">Number water gallons owned</label>
-            <span class="field-required" >(required)</span>
+            <span class="field-required">(required)</span>
             <br />
             25
           </div>
@@ -303,8 +298,7 @@ When confirmed, the form tries to delete the object::
   >>> sys.exc_info()[1].location
   'http://localhost'
 
-  >>> from zope.i18n import translate
-  >>> translate(deleteform.status, context=post)
+  >>> deleteform.status
   u'The object has been deleted.'
 
   >>> list(root.keys())
@@ -346,7 +340,7 @@ We can now register and test the customization::
   >>> adding = Adding(root, request, Factory(Fremen))
   >>> addform = AddForm(adding, request)
   >>> for field in addform.fields: print field
-  <TextLineSchemaField Name of the warrior>
+  <TextLineField Name of the warrior>
 
 We can test a more complex example, returning a brand new instance of
 Fields::
@@ -371,174 +365,3 @@ Fremen schema (even the title, unlike the default view)::
   >>> view = DefaultView(naib, request)
   >>> view.fields.keys()
   ['title', 'water']
-
-
-Events and field updates
-========================
-
-When using the generic `dolmen.forms.crud` forms, some events are
-triggered for you. They represent the lifecycle of the manipulated object.
-
-To check on all the events triggered, we can set up a simple event
-logging list and a generic handler::
-
-  >>> from zope.component import provideHandler
-  >>> from zope.lifecycleevent import IObjectModifiedEvent
-  >>> logger = []
-  
-  >>> def event_logger(object, event):
-  ...   logger.append(event)
-
-  >>> provideHandler(event_logger, (Fremen, IObjectModifiedEvent))
-
-
-Editing events
---------------
-
-Let's have the same introspection check with the edit form::
-
-  >>> logger = []
-
-We provide data for the update::
-
-  >>> request = TestRequest(form={
-  ...     'form.field.water': '10',
-  ...     'form.field.title': u'Sihaya',
-  ...     'form.action.update': u'Update'},
-  ...	  method='POST',
-  ...     )
-
-  >>> chani = Fremen()
-  >>> chani.__name__ = u'Chani'
-  >>> chani.__parent__ = root
-
-  >>> editform = EditForm(chani, request)
-  >>> editform.update()
-  >>> editform.updateForm()
-  Traceback (most recent call last):
-  ...  
-  HTTPFound
-
-We check the trigged events::
-
-  >>> for event in logger: print event
-  <...ObjectModifiedEvent object at ...>
-
-In depth, we can check if the updated fields are correctly set in the
-event's descriptions::
-
-  >>> for desc in logger[0].descriptions:
-  ...   print "%r: %s" % (desc.interface, desc.attributes)
-  <InterfaceClass dolmen.forms.crud.tests.IDesertWarrior>: ('water', 'title')
-
-  >>> chani.title
-  u'Sihaya'
-  >>> chani.water
-  10
-
-
-Field update
-------------
-
-`dolmen.forms.base` provides the description of a new component that
-can be used to propagate the updating process at the field level:
-`IFieldUpdate`. An implementation is available in `dolmen.forms.crud`,
-using an event handler, listening on ObjectModifiedEvent and
-ObjectCreatedEvent::
-
-  >>> updates = []
-
-  >>> from zope.schema import TextLine
-  >>> from zope.interface import implementer
-  >>> from dolmen.forms.base import IFieldUpdate
-  >>> from grokcore.component import adapts, provides, MultiSubscription
-
-  >>> class UpdateTextfield(MultiSubscription):
-  ...     """Logs updates of Title on IDesertWarrior in a list"""
-  ...     provides(IFieldUpdate)
-  ...     adapts(IDesertWarrior, TextLine)
-  ...
-  ...     def __init__(self, context, field):
-  ...         self.context = context
-  ...         self.field = field
-  ...
-  ...     def __call__(self):
-  ...         updates.append((self.context, self.field))
-
-  >>> grokcore.component.testing.grok_component('text', UpdateTextfield)
-  True
-
-
-Using an add form, the IFieldUpdate adapters should be called during an object
-creation::
-
-  >>> request = TestRequest(form={
-  ...     'form.field.title': u'Liet',
-  ...     'form.action.add': u'Add'},
-  ...	  method='POST',
-  ...     )
-
-  >>> tabr = Sietch()
-  >>> tabr.__name__ = 'Sietch Tabr'
-  >>> tabr.__parent__ = root
-
-  >>> adding = Adding(tabr, request, Factory(Fremen))
-  >>> addform = AddForm(adding, request)
-  >>> addform.update()
-  >>> addform.updateForm()
-  Traceback (most recent call last):
-  ...  
-  HTTPFound
-
-  >>> kynes = tabr['1']
-  >>> kynes
-  <dolmen.forms.crud.tests.Fremen object at ...>
-  >>> kynes.title
-  u'Liet'  
-
-  >>> print updates
-  [(<dolmen.forms.crud.tests.Fremen object at ...>,
-    <zope.schema._bootstrapfields.TextLine object at ...>)]
-
-
-We can do the same thing for the edit form::
-
-  >>> updates = []
-
-  >>> request = TestRequest(form={
-  ...     'form.field.water': '50',
-  ...     'form.field.title': u'Imperial weather specialist',
-  ...     'form.action.update': u'Update'},
-  ...	  method='POST',
-  ...     )
-
-  >>> editform = EditForm(kynes, request)
-  >>> editform.update()
-  >>> editform.updateForm()
-  Traceback (most recent call last):
-  ...  
-  HTTPFound
-
-  >> kynes.title
-  u'Imperial weather specialist'
-
-  >>> updates
-  [(<dolmen.forms.crud.tests.Fremen object at ...>,
-    <zope.schema._bootstrapfields.TextLine object at ...>)]
-
-Updating a field without a registered IFieldUpdate adapter shouldn't do
-anything::
-
- >>> updates = []
-
-  >>> request = TestRequest(form={
-  ...     'form.field.water': '40',
-  ...     'form.action.update': u'Update'},
-  ...	  method='POST',
-  ...     )
-
-  >>> editform = EditForm(kynes, request)
-  >>> editform.updateForm()
-
-  >>> updates
-  []

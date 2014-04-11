@@ -4,14 +4,14 @@ from os.path import join
 from setuptools import setup, find_packages
 
 name = 'dolmen.forms.crud'
-version = '2.2.2'
+version = '2.3'
 readme = open(join('src', 'dolmen', 'forms', 'crud', 'README.txt')).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
     'cromlech.browser >= 0.5',
-    'dolmen.forms.base >= 2.0',
-    'dolmen.forms.ztk >= 2.0',
+    'dolmen.forms.base >= 2.5',
+    'dolmen.forms.ztk >= 2.3.1',
     'dolmen.location',
     'dolmen.message',
     'grokcore.component',
@@ -31,6 +31,7 @@ install_requires = [
 tests_require = [
     'cromlech.browser [test]',
     'zope.configuration',
+    'cromlech.i18n',
     ]
 
 setup(name=name,

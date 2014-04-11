@@ -14,7 +14,4 @@
   <include package="zope.i18n" file="meta.zcml" />
   <i18n:registerTranslations directory="locales" />
 
-  <!-- Grokking package -->
-  <grok:grok package=".events" />
-
 </configure>
