@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from cromlech.browser.exceptions import HTTPFound, HTTPNotModified
-from dolmen.forms.base import Action
+from cromlech.browser.exceptions import HTTPFound
+from dolmen.forms.base import Action, SuccessMarker
 from dolmen.forms.base.markers import FAILURE
 from dolmen.forms.base.utils import set_fields_data, apply_data_event
 from dolmen.forms.crud import i18n as _
@@ -24,7 +24,7 @@ class CancelAction(Action):
     def __call__(self, form):
         content = form.getContentData().getContent()
         url = get_absolute_url(content, form.request)
-        raise HTTPNotModified(url)
+        return SuccessMarker('Aborted', True, url=url)
 
 
 class AddAction(Action):
@@ -48,7 +48,7 @@ class AddAction(Action):
 
         message(_(u"Content created"))
         url = get_absolute_url(obj, form.request)
-        raise HTTPFound(url)
+        return SuccessMarker('Added', True, url=url)
 
 
 class UpdateAction(Action):
@@ -64,7 +64,7 @@ class UpdateAction(Action):
         apply_data_event(form.fields, form.getContentData(), data)
         message(_(u"Content updated"))
         url = get_absolute_url(form.context, form.request)
-        raise HTTPFound(url)
+        return SuccessMarker('Updated', True, url=url)
 
 
 class DeleteAction(Action):
@@ -92,8 +92,8 @@ class DeleteAction(Action):
                     del container[name]
                     form.status = self.successMessage
                     message(form.status)
-                    url = get_absolute_url(content, form.request)
-                    raise HTTPFound(url)
+                    url = get_absolute_url(container, form.request)
+                    return SuccessMarker('Deleted', True, url=url)
                 except ValueError:
                     pass
 

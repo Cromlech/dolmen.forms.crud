@@ -36,6 +36,9 @@ msgstr "Ansicht"
 msgid "Delete"
 msgstr "Löschen"
 
+msgid "delete_action"
+msgstr "Löschen: ${name}"
+
 msgid "Cancel"
 msgstr "Abbrechen"
 

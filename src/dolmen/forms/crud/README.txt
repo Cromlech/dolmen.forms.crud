@@ -72,7 +72,7 @@ Defining some actors
 Creation of the root
 --------------------
 
-  >>> from cromlech.io.interfaces import IPublicationRoot
+  >>> from cromlech.browser.interfaces import IPublicationRoot
   >>> from zope.location import Location
   >>> from zope.interface import directlyProvides
 
@@ -118,9 +118,9 @@ interface called `IAdding` and precised in the `IFactoryAdding`.
   True
   >>> factory = Factory(Fremen)
 
-  >>> from cromlech.browser.testing import TestHTTPRequest, TestHTTPResponse
+  >>> from cromlech.browser.testing import TestRequest, TestResponse
 
-  >>> request = TestHTTPRequest()
+  >>> request = TestRequest()
   >>> adding = Adding(root, request, factory)
   
   >>> verify.verifyObject(IFactoryAdding, adding)
@@ -134,7 +134,7 @@ add form, context of the form is our adding component:
   >>> class AddForm(crud.Add):
   ...     '''Generic add form.
   ...     '''
-  ...     responseFactory = TestHTTPResponse
+  ...     responseFactory = TestResponse
 
   >>> addform = AddForm(adding, request)
   >>> addform
@@ -178,12 +178,12 @@ An edit form can be registered simply by sublassing the Edit base class::
   >>> class EditForm(crud.Edit):
   ...     '''Generic edit form.
   ...     '''
-  ...     responseFactory = TestHTTPResponse
+  ...     responseFactory = TestResponse
 
 This form registered, we can check if all the fields are ready to be
 edited::
 
-  >>> post = TestHTTPRequest(form={
+  >>> post = TestRequest(form={
   ...     'form.field.water': '25',
   ...     'form.field.title': u'Stilgar',
   ...     'form.action.update': u'Update'},
@@ -218,7 +218,7 @@ A special kind of form allows you display your content::
   >>> class DefaultView(crud.Display):
   ...     '''Generic display form.
   ...     '''
-  ...     responseFactory = TestHTTPResponse
+  ...     responseFactory = TestResponse
   
   >>> view = DefaultView(naib, request)
   >>> view
@@ -239,19 +239,19 @@ A display form has no actions::
 we can see, the title attribute is used as the HTML header (h1) of the
 page::
 
-  >>> print view()
+  >>> print view() # doctest:+NORMALIZE_WHITESPACE
   <html>
     <head>
     </head>
     <body>
-      <form action="http://localhost/1/" 
-            method="post"
-            enctype="multipart/form-data" id="form">
+      <form action="http://localhost/1/"
+            id="form" method="post"
+            enctype="multipart/form-data">
         <h1>1</h1>
         <div class="fields">
           <div class="field">
             <label class="field-label" for="form-field-water">Number water gallons owned</label>
-            <span class="field-required">(required)</span>
+            <span class="field-required" >(required)</span>
             <br />
             25
           </div>
@@ -269,7 +269,7 @@ A delete form is a simple form with no fields, that only provides a
   >>> class DeleteForm(crud.Delete):
   ...     '''Generic delete form.
   ...     '''
-  ...     responseFactory = TestHTTPResponse
+  ...     responseFactory = TestResponse
 
   >>> deleteform = DeleteForm(naib, request)
   >>> deleteform
@@ -285,7 +285,7 @@ A delete form is a simple form with no fields, that only provides a
 
 When confirmed, the form tries to delete the object::
 
-  >>> post = TestHTTPRequest(form={
+  >>> post = TestRequest(form={
   ...     'form.action.delete': u'Delete'},
   ...	  method='POST',
   ...     )
@@ -299,6 +299,9 @@ When confirmed, the form tries to delete the object::
   Traceback (most recent call last):
   ...  
   HTTPFound
+  >>> import sys
+  >>> sys.exc_info()[1].location
+  'http://localhost'
 
   >>> from zope.i18n import translate
   >>> translate(deleteform.status, context=post)
@@ -398,7 +401,7 @@ Let's have the same introspection check with the edit form::
 
 We provide data for the update::
 
-  >>> request = TestHTTPRequest(form={
+  >>> request = TestRequest(form={
   ...     'form.field.water': '10',
   ...     'form.field.title': u'Sihaya',
   ...     'form.action.update': u'Update'},
@@ -469,7 +472,7 @@ ObjectCreatedEvent::
 Using an add form, the IFieldUpdate adapters should be called during an object
 creation::
 
-  >>> request = TestHTTPRequest(form={
+  >>> request = TestRequest(form={
   ...     'form.field.title': u'Liet',
   ...     'form.action.add': u'Add'},
   ...	  method='POST',
@@ -502,7 +505,7 @@ We can do the same thing for the edit form::
 
   >>> updates = []
 
-  >>> request = TestHTTPRequest(form={
+  >>> request = TestRequest(form={
   ...     'form.field.water': '50',
   ...     'form.field.title': u'Imperial weather specialist',
   ...     'form.action.update': u'Update'},
@@ -528,7 +531,7 @@ anything::
 
  >>> updates = []
 
-  >>> request = TestHTTPRequest(form={
+  >>> request = TestRequest(form={
   ...     'form.field.water': '40',
   ...     'form.action.update': u'Update'},
   ...	  method='POST',

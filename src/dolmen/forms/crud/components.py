@@ -15,6 +15,15 @@ from zope.dublincore.interfaces import IDCDescriptiveProperties
 from zope.i18nmessageid import Message
 
 
+def dc_title_or_name(obj):
+    """get title of obj or get its name"""
+    dc = IDCDescriptiveProperties(obj, None)
+    if dc is not None and dc.title:
+        return dc.title
+    else:
+        return getattr(obj, '__name__', '')
+
+
 class Add(Form):
     """The add form itself is not protected. The security is checked on
     'update'. It checks if the 'require' directive of the factored item
@@ -61,7 +70,7 @@ class Edit(Form):
     @property
     def label(self):
         label = _(u"edit_action", default=u"Edit: $name",
-                  mapping={"name": self.context.__name__})
+                  mapping={"name": dc_title_or_name(self.context)})
         return zope.i18n.translate(label, context=self.request)
 
     @CachedProperty
@@ -82,10 +91,7 @@ class Display(Form):
 
     @property
     def label(self):
-        dc = IDCDescriptiveProperties(self.context, None)
-        if dc is not None and dc.title:
-            return dc.title
-        return getattr(self.context, '__name__', u'')
+        return dc_title_or_name(self.context)
 
     @CachedProperty
     def fields(self):
@@ -101,7 +107,12 @@ class Delete(Form):
     grok.title(_(u"Delete"))
     grok.context(ILocation)
 
-    label = _(u"Delete")
     description = _(u"Are you really sure ?")
     actions = Actions(formactions.DeleteAction(_("Delete")),
                       formactions.CancelAction(_("Cancel")))
+
+    @property
+    def label(self):
+        label = _(u"delete_action", default=u"Delete: $name",
+                  mapping={"name": dc_title_or_name(self.context)})
+        return zope.i18n.translate(label, context=self.request)
