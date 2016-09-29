@@ -1,0 +1,61 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: dolmen.forms.crud\n"
+"POT-Creation-Date: 2016-29-09 16:08+0100\n"
+"PO-Revision-Date: 2016-29-09 01:44+0100\n"
+"Last-Translator: Christian KLINGER <ck@cnovareto.de>\n"
+"Language-Team: Christian KLINGER <ck@novareto.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language-Code: de\n"
+"Language-Name: Deutsch\n"
+"Preferred-Encodings: utf-8\n"
+"Domain: dolmen.forms.crud\n"
+"X-Is-Fallback-For: de-DE\n"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "add_action"
+msgstr "Hinzufügen: ${name}"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "edit_action"
+msgstr "Bearbeiten: ${name}"
+
+msgid "Update"
+msgstr "Ändern"
+
+msgid "View"
+msgstr "Ansicht"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Content created"
+msgstr "Inhalt erstellt"
+
+msgid "Content updated"
+msgstr "Inhalt geändert"
+
+msgid "Are you really sure ?"
+msgstr "Sind Sie sicher ?"
+
+msgid "Confirm deletion"
+msgstr "Bitte Bestätigen Sie das Löschen"
+
+msgid "The object has been deleted."
+msgstr "Der Inhalt wurde entfernt."
+
+msgid "This object could not be deleted."
+msgstr "Der Inhalt konnte nicht gelöscht werden."
+
+msgid "Errors occured during the form processing"
+msgstr "Es sind Fehler aufgetreten."
