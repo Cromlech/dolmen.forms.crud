@@ -4,7 +4,7 @@ from crom import sources, subscription, target
 from dolmen.forms.base import IFieldUpdate
 from dolmen.forms.crud import utils
 from zope.interface import Interface
-from cromlech.events import IObjectModifiedEvent, IObjectCreatedEvent
+from zope.lifecycleevent import IObjectModifiedEvent, IObjectCreatedEvent
 
 
 @subscription

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from cromlech.browser import IURL
-from cromlech.events import ObjectCreatedEvent
-
 from dolmen.forms.base import Action, SuccessMarker
 from dolmen.forms.base.markers import FAILURE
 from dolmen.forms.base.utils import set_fields_data, apply_data_event
@@ -11,6 +9,7 @@ from dolmen.message.utils import send
 
 from zope.event import notify
 from zope.location import ILocation
+from zope.lifecycleevent import ObjectCreatedEvent
 
 
 def message(message):

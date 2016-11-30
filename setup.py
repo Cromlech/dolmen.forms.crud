@@ -12,8 +12,8 @@ install_requires = [
     'crom',
     'cromlech.browser >= 0.5',
     'cromlech.content',
-    'cromlech.events',
     'cromlech.i18n',
+    'dolmen.batch',
     'dolmen.forms.base >= 2.0',
     'dolmen.message',
     'setuptools',
@@ -21,6 +21,7 @@ install_requires = [
     'zope.event',
     'zope.i18nmessageid',
     'zope.interface',
+    'zope.lifecycleevent',
     'zope.location',
     'zope.schema',
     ]
