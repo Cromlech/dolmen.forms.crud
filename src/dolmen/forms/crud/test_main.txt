@@ -18,9 +18,8 @@ Configuration of the package
   >>> testing.setup()
 
   >>> import crom
-  >>> from cromlech import events
-  >>> from dolmen.forms import base, ztk, crud
-  >>> crom.configure(base, ztk, crud, events)
+  >>> from dolmen.forms import base, ztk
+  >>> crom.configure(base, ztk)
 
 
   >>> logger = []
@@ -40,7 +39,7 @@ Adding a base URL resolver
 
   >>> def absolute_url(object, request):
   ...    baseurl = 'http://localhost'
-  ...    name = getattr(object, '__name__', u'')
+  ...    name = getattr(object, '__name__', '')
   ...    if name is None:
   ...        return baseurl
   ...    return baseurl + '/' + name
@@ -55,6 +54,7 @@ Defining some actors
   >>> from zope.interface import implementer
   >>> from zope.location import ILocation, Location
 
+
   >>> class IDesertWarrior(Interface):
   ...     """Defines a warrior living in the desert.
   ...     """
@@ -67,6 +67,7 @@ Defining some actors
   ...         title=u"Number water gallons owned",
   ...         default=1,
   ...         required=True)
+
 
   >>> class Sietch(Location):
   ...    """A grotto located on Arrakis.
@@ -85,6 +86,7 @@ Defining some actors
   ...
   ...    def keys(self):
   ...       return self.contents.keys()
+
 
   >>> @implementer(IDesertWarrior)
   ... class Fremen(Location):
@@ -200,7 +202,7 @@ presence of the fields and actions on the form itself::
   ['title', 'water']
   
   >>> addform.updateForm()
-  >>> for action in addform.actions: print action
+  >>> for action in addform.actions: print(action)
   <AddAction Add>
   <CancelAction Cancel>
 
@@ -222,8 +224,8 @@ edited::
 
   >>> post = TestRequest(form={
   ...     'form.field.water': '25',
-  ...     'form.field.title': u'Stilgar',
-  ...     'form.action.update': u'Update'},
+  ...     'form.field.title': 'Stilgar',
+  ...     'form.action.update': 'Update'},
   ...	  method='POST')
 
   >>> editform = EditForm(naib, post)
@@ -231,10 +233,10 @@ edited::
   <...EditForm object at ...>
 
   >>> editform.update()
-  >>> editform.updateForm()
+  >>> editform.updateForm()  # doctest: +ELLIPSIS
   Traceback (most recent call last):
   ...  
-  HTTPFound
+  cromlech.browser.exceptions.HTTPFound: http://localhost/1
 
   >>> editform.fields.keys()
   ['title', 'water']
@@ -242,12 +244,32 @@ edited::
 As we called updateForm, the values should now be set::
 
   >>> naib.title
-  u'Stilgar'
+  'Stilgar'
   >>> naib.water
   25
 
-  >>> print logger
-  [<cromlech.events.components.ObjectModifiedEvent object at ...>]
+
+The events logger is now filled with FieldUpdatedEvent (one for each field).
+It eventually has the ObjectModifiedEvent that sums up what happened :
+
+  >>> from zope.schema.fieldproperty import FieldUpdatedEvent
+  >>> fields_events = [e for e in logger if isinstance(e, FieldUpdatedEvent)]
+  >>> assert len(fields_events) == 10
+
+  >>> for e in fields_events: print(e.inst.title)
+  Name of the warrior
+  Name of the warrior
+  Name of the warrior
+  Name of the warrior
+  Name of the warrior
+  Name of the warrior
+  Number water gallons owned
+  Number water gallons owned
+  Number water gallons owned
+  Number water gallons owned
+
+  >>> print(logger[-1])
+  <zope.lifecycleevent.ObjectModifiedEvent object at ...>
   >>> logger = logger[:]
 
 
@@ -282,7 +304,7 @@ A display form has no actions::
 we can see, the title attribute is used as the HTML header (h1) of the
 page::
 
-  >>> print view()  # doctest: +NORMALIZE_WHITESPACE
+  >>> print(view())  # doctest: +NORMALIZE_WHITESPACE
   <html>
     <head>
     </head>
@@ -320,7 +342,7 @@ A delete form is a simple form with no fields, that only provides a
   <...DeleteForm object at ...>
 
   >>> deleteform.updateForm()
-  >>> for action in deleteform.actions: print action
+  >>> for action in deleteform.actions: print(action)
   <DeleteAction Delete>
   <CancelAction Cancel>
 
@@ -330,7 +352,7 @@ A delete form is a simple form with no fields, that only provides a
 When confirmed, the form tries to delete the object::
 
   >>> post = TestRequest(form={
-  ...     'form.action.delete': u'Delete'},
+  ...     'form.action.delete': 'Delete'},
   ...	  method='POST',
   ...     )
 
@@ -342,14 +364,11 @@ When confirmed, the form tries to delete the object::
   >>> deleteform.updateForm()
   Traceback (most recent call last):
   ...  
-  HTTPFound
-  >>> import sys
-  >>> sys.exc_info()[1].location
-  'http://localhost'
+  cromlech.browser.exceptions.HTTPFound: http://localhost
 
   >>> from cromlech.i18n import translate
   >>> translate(deleteform.status)
-  u'The object has been deleted.'
+  'The object has been deleted.'
 
   >>> list(root.keys())
   []
@@ -374,13 +393,13 @@ We provide data for the update::
 
   >>> request = TestRequest(form={
   ...     'form.field.water': '10',
-  ...     'form.field.title': u'Sihaya',
-  ...     'form.action.update': u'Update'},
+  ...     'form.field.title': 'Sihaya',
+  ...     'form.action.update': 'Update'},
   ...	  method='POST',
   ...     )
 
   >>> chani = Fremen()
-  >>> chani.__name__ = u'Chani'
+  >>> chani.__name__ = 'Chani'
   >>> chani.__parent__ = root
 
   >>> editform = EditForm(chani, request)
@@ -388,126 +407,22 @@ We provide data for the update::
   >>> editform.updateForm()
   Traceback (most recent call last):
   ...  
-  HTTPFound
+  cromlech.browser.exceptions.HTTPFound: http://localhost/Chani
+
 
 We check the trigged events::
 
-  >>> print logger
-  [<cromlech.events.components.ObjectModifiedEvent object at ...>]
+  >>> print(logger[-1])
+  <zope.lifecycleevent.ObjectModifiedEvent object at ...>
 
 In depth, we can check if the updated fields are correctly set in the
 event's descriptions::
 
-  >>> for desc in logger[0].descriptions:
-  ...   print "%r: %s" % (desc.interface, desc.attributes)
-  <InterfaceClass ...IDesertWarrior>: ('water', 'title')
+  >>> for desc in logger[-1].descriptions:
+  ...   print("%r: %s" % (desc.interface, sorted(desc.attributes)))
+  <InterfaceClass __main__.IDesertWarrior>: ['title', 'water']
 
   >>> chani.title
-  u'Sihaya'
+  'Sihaya'
   >>> chani.water
   10
-
-
-Field update
-------------
-
-:py:module:`dolmen.forms.base` provides the description of a new component that
-can be used to propagate the updating process at the field level:
-`IFieldUpdate`. An implementation is available in :py:module:`dolmen.forms.crud`,
-using an event handler, listening on ObjectModifiedEvent and
-ObjectCreatedEvent::
-
-  >>> updates = []
-
-  >>> from zope.schema.interfaces import ITextLine
-  >>> from dolmen.forms.base import IFieldUpdate
-
-  >>> class UpdateTextfield(object):
-  ...     """Logs updates of Title on IDesertWarrior in a list"""
-  ...
-  ...     def __init__(self, context, field):
-  ...         self.context = context
-  ...         self.field = field
-  ...
-  ...     def __call__(self):
-  ...         updates.append('%r updated %r' % (self.context.title,
-  ...                                           self.field.__name__))
-
-  >>> implicit.lookup.subscribe(
-  ...     (IDesertWarrior, ITextLine), IFieldUpdate, UpdateTextfield)
-
-
-Using an add form, the IFieldUpdate adapters should be called during an object
-creation::
-
-  >>> request = TestRequest(form={
-  ...     'form.field.water': '10',
-  ...     'form.field.title': u'Liet',
-  ...     'form.action.add': u'Add'},
-  ...	  method='POST',
-  ...     )
-
-  >>> tabr = Sietch()
-  >>> tabr.__name__ = 'Sietch Tabr'
-  >>> tabr.__parent__ = root
-
-  >>> adding = Adding(tabr, request, Factory(Fremen))
-  >>> addform = AddForm(adding, request)
-  >>> addform.update()
-  >>> addform.updateForm()
-  Traceback (most recent call last):
-  ...  
-  HTTPFound
-
-  >>> kynes = tabr['1']
-  >>> kynes
-  <...Fremen object at ...>
-  >>> kynes.title
-  u'Liet'
-
-  >>> print updates # doctest: +ELLIPSIS
-  ["u'Liet' updated 'title'"]
-
-
-We can do the same thing for the edit form::
-
-  >>> updates = []
-
-  >>> request = TestRequest(form={
-  ...     'form.field.water': '50',
-  ...     'form.field.title': u'Imperial weather specialist',
-  ...     'form.action.update': u'Update'},
-  ...	  method='POST',
-  ...     )
-
-  >>> editform = EditForm(kynes, request)
-  >>> editform.update()
-  >>> editform.updateForm()
-  Traceback (most recent call last):
-  ...  
-  HTTPFound
-
-  >> kynes.title
-  u'Imperial weather specialist'
-
-  >>> updates
-  ["u'Imperial weather specialist' updated 'title'"]
-
-Updating a field without a registered IFieldUpdate adapter shouldn't do
-anything::
-
-  >>> updates = []
-
-  >>> request = TestRequest(form={
-  ...     'form.field.water': '40',
-  ...     'form.action.update': u'Update'},
-  ...	  method='POST',
-  ...     )
-
-  >>> editform = EditForm(kynes, request)
-  >>> editform.updateForm()
-
-  >>> updates
-  []
-
-  >>> testing.teardown()
