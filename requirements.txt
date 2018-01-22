@@ -1,0 +1,14 @@
+git+https://github.com/Cromlech/crom.git#egg=crom
+git+https://github.com/Cromlech/cromlech.browser.git#egg=cromlech.browser 
+git+https://github.com/Cromlech/cromlech.content.git#egg=cromlech.content
+git+https://github.com/Cromlech/cromlech.events.git#egg=cromlech.events
+git+https://github.com/Cromlech/cromlech.grok.git#egg=cromlech.grok
+git+https://github.com/Cromlech/cromlech.i18n.git#egg=cromlech.i18n
+git+https://github.com/Cromlech/cromlech.webob.git#egg=cromlech.webob
+git+https://github.com/Cromlech/dolmen.collection.git#egg=dolmen.collection
+git+https://github.com/Cromlech/dolmen.forms.base.git#egg=dolmen.forms.base
+git+https://github.com/Cromlech/dolmen.forms.ztk.git#egg=dolmen.forms.ztk
+git+https://github.com/Cromlech/dolmen.message.git#egg=dolmen.message
+git+https://github.com/Cromlech/dolmen.template.git#egg=dolmen.template
+git+https://github.com/Cromlech/grokker.git#egg=grokker
+BeautifulSoup4 >= 4.4
